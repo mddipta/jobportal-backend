@@ -9,21 +9,31 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.lawencon.jobportal.authentication.helper.SessionHelper;
 import com.lawencon.jobportal.model.request.jobvacancy.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.jobvacancy.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.jobvacancy.UpdateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.jobvacancy.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.request.jobvacancytransaction.CreateJobVacancyTransactionRequest;
+import com.lawencon.jobportal.model.response.jobstatus.JobStatusResponse;
 import com.lawencon.jobportal.model.response.jobvacancy.JobVacancyResponse;
 import com.lawencon.jobportal.persistence.entity.EmploymentType;
+import com.lawencon.jobportal.persistence.entity.JobStatus;
 import com.lawencon.jobportal.persistence.entity.JobTitle;
 import com.lawencon.jobportal.persistence.entity.JobVacancy;
+import com.lawencon.jobportal.persistence.entity.JobVacancyTransaction;
 import com.lawencon.jobportal.persistence.entity.LevelExperience;
 import com.lawencon.jobportal.persistence.entity.Location;
+import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.persistence.repository.JobVacancyRepository;
 import com.lawencon.jobportal.service.EmploymentTypeService;
+import com.lawencon.jobportal.service.JobStatusService;
 import com.lawencon.jobportal.service.JobTitleService;
 import com.lawencon.jobportal.service.JobVacancyService;
+import com.lawencon.jobportal.service.JobVacancyTransactionService;
 import com.lawencon.jobportal.service.LevelExperienceService;
 import com.lawencon.jobportal.service.LocationService;
+import com.lawencon.jobportal.service.UserService;
 
 import lombok.AllArgsConstructor;
 
@@ -36,6 +46,9 @@ public class JobVacancyServiceImpl implements JobVacancyService {
     EmploymentTypeService employmentTypeService;
     LevelExperienceService levelExperienceService;
     LocationService locationService;
+    JobVacancyTransactionService jobVacancyTransactionService;
+    JobStatusService jobStatusService;
+    UserService userService;
 
     @Override
     public List<JobVacancyResponse> getAll() {
@@ -52,6 +65,9 @@ public class JobVacancyServiceImpl implements JobVacancyService {
     @Override
     public JobVacancyResponse getById(String id) {
         JobVacancy jobVacancy = repository.findById(id).orElse(null);
+
+        Optional<JobVacancyTransaction> jobVacancyTransaction = transaction(id);
+
         return mapToResponse(jobVacancy);
     }
 
@@ -152,6 +168,66 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         repository.deleteById(id);
     }
 
+    @Override
+    public void setPicToVacancy(SetPicToVacancyRequest request) {
+        CreateJobVacancyTransactionRequest createJobVacancyTransactionRequest =
+                new CreateJobVacancyTransactionRequest();
+
+        JobVacancy jobVacancy = getEntityById(request.getJobVacancyId());
+        createJobVacancyTransactionRequest.setJobVacancy(jobVacancy);
+
+        JobStatusResponse data = jobStatusService.getByCode("PD");
+        JobStatus jobStatus = jobStatusService.getEntityById(data.getId());
+        createJobVacancyTransactionRequest.setJobStatus(jobStatus);
+
+        Optional<User> user = userService.getEntityById(request.getUserId());
+        createJobVacancyTransactionRequest.setUser(user.get());
+
+        createJobVacancyTransactionRequest.setDate(LocalDate.now());
+
+        Optional<JobVacancyTransaction> jobVacancyTransaction =
+                transaction(request.getJobVacancyId());
+        if (jobVacancyTransaction.isPresent()) {
+            createJobVacancyTransactionRequest
+                    .setNumber(jobVacancyTransaction.get().getNumber() + 1);
+        } else {
+            createJobVacancyTransactionRequest.setNumber(1L);
+        }
+
+        jobVacancyTransactionService.create(createJobVacancyTransactionRequest);
+    }
+
+    @Override
+    public void publishVacancy(UpdateStatusJobVacancyRequest request) {
+        User currentUser = SessionHelper.getLoginUser();
+        if (currentUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authenticated");
+        }
+
+        CreateJobVacancyTransactionRequest createJobVacancyTransactionRequest =
+                new CreateJobVacancyTransactionRequest();
+
+        JobVacancy jobVacancy = getEntityById(request.getJobVacancyId());
+        createJobVacancyTransactionRequest.setJobVacancy(jobVacancy);
+
+        JobStatus jobStatus = jobStatusService.getEntityById(request.getStatus());
+        createJobVacancyTransactionRequest.setJobStatus(jobStatus);
+
+        Optional<User> user = userService.getEntityById(currentUser.getId());
+        createJobVacancyTransactionRequest.setUser(user.get());
+
+        createJobVacancyTransactionRequest.setDate(LocalDate.now());
+        Optional<JobVacancyTransaction> jobVacancyTransaction =
+                transaction(request.getJobVacancyId());
+        if (jobVacancyTransaction.isPresent()) {
+            createJobVacancyTransactionRequest
+                    .setNumber(jobVacancyTransaction.get().getNumber() + 1);
+        } else {
+            createJobVacancyTransactionRequest.setNumber(1L);
+        }
+
+        jobVacancyTransactionService.create(createJobVacancyTransactionRequest);
+    }
 
     private JobVacancyResponse mapToResponse(JobVacancy jobVacancy) {
         JobVacancyResponse response = new JobVacancyResponse();
@@ -161,5 +237,9 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         response.setLocation(jobVacancy.getLocation().getName());
         BeanUtils.copyProperties(jobVacancy, response);
         return response;
+    }
+
+    private Optional<JobVacancyTransaction> transaction(String id) {
+        return jobVacancyTransactionService.getLastByJobVacancyId(id);
     }
 }

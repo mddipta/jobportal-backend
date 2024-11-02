@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.jobvacancy.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.jobvacancy.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.jobvacancy.UpdateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.jobvacancy.UpdateStatusJobVacancyRequest;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.model.response.jobvacancy.JobVacancyResponse;
 import com.lawencon.jobportal.service.JobVacancyService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Job Vacancy", description = "Job Vacancy API endpoint")
@@ -59,4 +62,19 @@ public class JobVacancyController {
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
+    @RolesAllowed({"SA"})
+    @PostMapping(value = "/job-vacancy/set-pic", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<String>> setPic(
+            @RequestBody @Valid SetPicToVacancyRequest request) {
+        service.setPicToVacancy(request);
+        return ResponseEntity.ok(ResponseHelper.ok("Success add pic to vacancy"));
+    }
+
+    @RolesAllowed({"HR"})
+    @PostMapping(value = "/job-vacancy/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<String>> changeStatus(
+            @RequestBody @Valid UpdateStatusJobVacancyRequest request) {
+        service.publishVacancy(request);
+        return ResponseEntity.ok(ResponseHelper.ok("Success change status"));
+    }
 }
