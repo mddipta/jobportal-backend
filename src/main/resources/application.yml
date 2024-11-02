@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: jobportal
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/jobportal_springboot
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jackson:
+    default-property-inclusion: NON_NULL
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: madedipta88@gmail.com
+    password: "fjnu dqlh fwbb rldh"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+    io:
+      jsonwebtoken: DEBUG
+file:
+  path: uploads
