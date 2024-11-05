@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
+import com.lawencon.jobportal.model.response.EducationResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.education.EducationResponse;
 import com.lawencon.jobportal.service.EducationService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,9 +21,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import com.lawencon.jobportal.model.request.education.CreateEducationRequest;
-import com.lawencon.jobportal.model.request.education.UpdateEducationRequest;
+import com.lawencon.jobportal.model.request.CreateEducationRequest;
+import com.lawencon.jobportal.model.request.UpdateEducationRequest;
 
 
 @Tag(name = "Education", description = "Education API endpoint")
@@ -50,12 +49,12 @@ public class EducationController {
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
-    @GetMapping(value = "/education/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/educations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<EducationResponse>> getById(@PathVariable String id) {
         return ResponseEntity.ok(ResponseHelper.ok(service.getById(id)));
     }
 
-    @DeleteMapping(value = "/education/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/educations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));

@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.jobtitle.CreateJobTitle;
-import com.lawencon.jobportal.model.request.jobtitle.UpdateJobTitle;
+import com.lawencon.jobportal.model.request.CreateJobTitle;
+import com.lawencon.jobportal.model.request.UpdateJobTitle;
+import com.lawencon.jobportal.model.response.JobTitleDetailResponse;
+import com.lawencon.jobportal.model.response.JobTitleResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.jobtitle.JobTitleDetailResponse;
-import com.lawencon.jobportal.model.response.jobtitle.JobTitleResponse;
 import com.lawencon.jobportal.service.JobTitleService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,27 +37,27 @@ public class JobTitleController {
         return ResponseEntity.ok(ResponseHelper.ok(service.getAll()));
     }
 
-    @GetMapping(value = "/job-title/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/job-titles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<JobTitleDetailResponse>> getById(@PathVariable String id) {
         return ResponseEntity.ok(ResponseHelper.ok(service.getById(id)));
     }
 
     @RolesAllowed({"SA"})
-    @PostMapping(value = "/job-title", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/job-titles", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> create(@RequestBody CreateJobTitle request) {
         service.create(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
     @RolesAllowed({"SA"})
-    @PutMapping(value = "/job-title", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/job-titles", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> update(@RequestBody UpdateJobTitle request) {
         service.update(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
     @RolesAllowed({"SA"})
-    @DeleteMapping(value = "/job-title/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/job-titles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));

@@ -3,18 +3,21 @@ package com.lawencon.jobportal.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.lawencon.jobportal.authentication.helper.SessionHelper;
-import com.lawencon.jobportal.model.request.education.CreateEducationRequest;
-import com.lawencon.jobportal.model.request.education.UpdateEducationRequest;
-import com.lawencon.jobportal.model.response.education.EducationResponse;
+import com.lawencon.jobportal.model.request.CreateEducationRequest;
+import com.lawencon.jobportal.model.request.UpdateEducationRequest;
+import com.lawencon.jobportal.model.response.EducationResponse;
 import com.lawencon.jobportal.persistence.entity.Education;
 import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.persistence.repository.EducationRepository;
 import com.lawencon.jobportal.service.EducationService;
+
 import lombok.AllArgsConstructor;
 
 @Service
@@ -74,6 +77,8 @@ public class EducationServiceImpl implements EducationService {
 
     private EducationResponse mapToResponse(Education education) {
         EducationResponse response = new EducationResponse();
+        response.setStartDate(education.getStartDate().toString());
+        response.setEndDate(education.getEndDate().toString());
         BeanUtils.copyProperties(education, response);
         return response;
     }

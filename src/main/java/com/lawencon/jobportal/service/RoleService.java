@@ -1,6 +1,6 @@
 package com.lawencon.jobportal.service;
 
-import com.lawencon.jobportal.model.response.role.RoleResponse;
+import com.lawencon.jobportal.model.response.RoleResponse;
 import com.lawencon.jobportal.persistence.entity.Role;
 
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.lawencon.jobportal.service;
 
 import java.util.List;
-
-import com.lawencon.jobportal.model.request.jobvacancy.CreateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.SetPicToVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateStatusJobVacancyRequest;
-import com.lawencon.jobportal.model.response.jobvacancy.JobVacancyResponse;
+import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdatePicJobVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.persistence.entity.JobVacancy;
 
 public interface JobVacancyService {
@@ -25,4 +25,6 @@ public interface JobVacancyService {
     void setPicToVacancy(SetPicToVacancyRequest request);
 
     void publishVacancy(UpdateStatusJobVacancyRequest request);
+
+    void updatePicToVacancy(UpdatePicJobVacancyRequest request);
 }

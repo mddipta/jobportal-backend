@@ -12,8 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.lawencon.jobportal.authentication.helper.SessionHelper;
-import com.lawencon.jobportal.model.request.userprofile.CreateUserProfileRequest;
-import com.lawencon.jobportal.model.response.userprofile.UserProfileResponse;
+import com.lawencon.jobportal.model.request.CreateUserProfileRequest;
+import com.lawencon.jobportal.model.request.UpdateUserProfileRequest;
+import com.lawencon.jobportal.model.response.UserProfileResponse;
 import com.lawencon.jobportal.persistence.entity.File;
 import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.persistence.entity.UserProfile;
@@ -27,18 +28,15 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
-    UserProfileRepository repository;
-    UserService userService;
-    FileService fileService;
+    private final UserProfileRepository repository;
+    private final UserService userService;
+    private final FileService fileService;
 
     @Override
-    public Optional<UserProfile> getEntityById(String id) {
-        return repository.findById(id);
-    }
+    public UserProfileResponse getByUserId() {
+        User currentUser = SessionHelper.getLoginUser();
 
-    @Override
-    public UserProfileResponse getByUserId(String id) {
-        Optional<UserProfile> userProfile = repository.findByUserId(id);
+        Optional<UserProfile> userProfile = repository.findByUserId(currentUser.getId());
         if (userProfile.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile not found");
         }
@@ -99,7 +97,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public void update(CreateUserProfileRequest request) {
+    public void update(UpdateUserProfileRequest request) {
         User currentUser = SessionHelper.getLoginUser();
 
         if (currentUser == null) {

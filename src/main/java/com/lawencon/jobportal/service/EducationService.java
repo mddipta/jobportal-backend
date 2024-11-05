@@ -1,10 +1,9 @@
 package com.lawencon.jobportal.service;
 
 import java.util.List;
-
-import com.lawencon.jobportal.model.request.education.CreateEducationRequest;
-import com.lawencon.jobportal.model.request.education.UpdateEducationRequest;
-import com.lawencon.jobportal.model.response.education.EducationResponse;
+import com.lawencon.jobportal.model.request.CreateEducationRequest;
+import com.lawencon.jobportal.model.request.UpdateEducationRequest;
+import com.lawencon.jobportal.model.response.EducationResponse;
 
 public interface EducationService {
     List<EducationResponse> getByUser();

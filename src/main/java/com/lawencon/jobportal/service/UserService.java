@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
-
-import com.lawencon.jobportal.model.request.user.CreateUserRequest;
-import com.lawencon.jobportal.model.request.user.LoginRequest;
-import com.lawencon.jobportal.model.request.user.RegisterUserRequest;
-import com.lawencon.jobportal.model.request.user.UpdateUserRequest;
-import com.lawencon.jobportal.model.request.user.VerificationOtpRequest;
-import com.lawencon.jobportal.model.response.user.UserResponse;
+import com.lawencon.jobportal.model.request.CreateUserRequest;
+import com.lawencon.jobportal.model.request.LoginRequest;
+import com.lawencon.jobportal.model.request.RegisterUserRequest;
+import com.lawencon.jobportal.model.request.UpdateUserRequest;
+import com.lawencon.jobportal.model.request.VerificationOtpRequest;
+import com.lawencon.jobportal.model.response.UserResponse;
 import com.lawencon.jobportal.persistence.entity.User;
 
 public interface UserService {
@@ -33,4 +32,6 @@ public interface UserService {
     void delete(String id);
 
     void validateOtp(VerificationOtpRequest request);
+
+    UserResponse getById(String id);
 }

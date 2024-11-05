@@ -12,8 +12,8 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import com.lawencon.jobportal.helper.ResponseHelper;
+import com.lawencon.jobportal.model.response.JobStatusResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.jobstatus.JobStatusResponse;
 
 @Tag(name = "Job Status", description = "Job Status API endpoint")
 @RestController
@@ -29,7 +29,7 @@ public class JobStatusController {
     }
 
     @RolesAllowed({"SA"})
-    @GetMapping(value = "/job-status/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/job-statuses/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<JobStatusResponse>> findById(@PathVariable String code) {
         return ResponseEntity.ok(ResponseHelper.ok(service.getByCode(code)));
     }

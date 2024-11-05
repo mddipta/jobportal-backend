@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 import com.lawencon.jobportal.helper.ResponseHelper;
+import com.lawencon.jobportal.model.response.SelectionStageResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.selectionstages.SelectionStageResponse;
 import com.lawencon.jobportal.service.SelectionStageService;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping({"/api/v1"})
 @AllArgsConstructor
 public class SelectionStageController {
-    SelectionStageService service;
+    private final SelectionStageService service;
 
     @RolesAllowed({"SA"})
     @GetMapping(value = "/selection-stages", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,7 +31,7 @@ public class SelectionStageController {
     }
 
     @RolesAllowed({"SA"})
-    @GetMapping(value = "/selection-stage/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/selection-stages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<SelectionStageResponse>> findById(@PathVariable String code) {
         return ResponseEntity.ok(ResponseHelper.ok(service.getByCode(code)));
     }

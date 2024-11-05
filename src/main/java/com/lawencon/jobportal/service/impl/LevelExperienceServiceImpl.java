@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.response.levelexperience.LevelExperienceResponse;
+import com.lawencon.jobportal.model.response.LevelExperienceResponse;
 import com.lawencon.jobportal.persistence.entity.LevelExperience;
 import com.lawencon.jobportal.persistence.repository.LevelExperienceRepository;
 import com.lawencon.jobportal.service.LevelExperienceService;
@@ -17,7 +16,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class LevelExperienceServiceImpl implements LevelExperienceService {
-    LevelExperienceRepository repository;
+    private final LevelExperienceRepository repository;
 
     @Override
     public List<LevelExperienceResponse> getAll() {

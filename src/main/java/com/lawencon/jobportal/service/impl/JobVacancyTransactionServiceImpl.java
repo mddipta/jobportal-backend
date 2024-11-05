@@ -3,8 +3,7 @@ package com.lawencon.jobportal.service.impl;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.request.jobvacancytransaction.CreateJobVacancyTransactionRequest;
+import com.lawencon.jobportal.model.request.CreateJobVacancyTransactionRequest;
 import com.lawencon.jobportal.persistence.entity.JobVacancyTransaction;
 import com.lawencon.jobportal.persistence.repository.JobVacancyTransactionRepository;
 import com.lawencon.jobportal.service.JobVacancyTransactionService;

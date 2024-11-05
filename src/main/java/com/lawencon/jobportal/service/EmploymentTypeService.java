@@ -1,6 +1,6 @@
 package com.lawencon.jobportal.service;
 
-import com.lawencon.jobportal.model.response.employmenttype.EmploymentTypeResponse;
+import com.lawencon.jobportal.model.response.EmploymentTypeResponse;
 import com.lawencon.jobportal.persistence.entity.EmploymentType;
 
 import java.util.List;

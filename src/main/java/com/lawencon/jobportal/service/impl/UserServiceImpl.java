@@ -1,19 +1,9 @@
 package com.lawencon.jobportal.service.impl;
 
-import com.lawencon.jobportal.authentication.model.UserPrinciple;
-import com.lawencon.jobportal.model.request.user.CreateUserRequest;
-import com.lawencon.jobportal.model.request.user.LoginRequest;
-import com.lawencon.jobportal.model.request.user.RegisterUserRequest;
-import com.lawencon.jobportal.model.request.user.UpdateUserRequest;
-import com.lawencon.jobportal.model.response.user.UserResponse;
-import com.lawencon.jobportal.persistence.entity.Role;
-import com.lawencon.jobportal.persistence.entity.User;
-import com.lawencon.jobportal.persistence.repository.UserRepository;
-import com.lawencon.jobportal.service.RoleService;
-import com.lawencon.jobportal.service.UserService;
-
-import lombok.AllArgsConstructor;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,17 +13,21 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.BeanUtils;
-
-import com.lawencon.jobportal.model.request.user.VerificationOtpRequest;
-import com.lawencon.jobportal.persistence.entity.Otp;
+import com.lawencon.jobportal.authentication.model.UserPrinciple;
+import com.lawencon.jobportal.model.request.CreateUserRequest;
+import com.lawencon.jobportal.model.request.LoginRequest;
+import com.lawencon.jobportal.model.request.RegisterUserRequest;
+import com.lawencon.jobportal.model.request.UpdateUserRequest;
+import com.lawencon.jobportal.model.request.VerificationOtpRequest;
+import com.lawencon.jobportal.model.response.UserResponse;
+import com.lawencon.jobportal.persistence.entity.Role;
+import com.lawencon.jobportal.persistence.entity.User;
+import com.lawencon.jobportal.persistence.repository.UserRepository;
 import com.lawencon.jobportal.service.EmailService;
 import com.lawencon.jobportal.service.OtpService;
+import com.lawencon.jobportal.service.RoleService;
+import com.lawencon.jobportal.service.UserService;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -187,6 +181,15 @@ public class UserServiceImpl implements UserService {
         repository.saveAndFlush(updatedUser);
     }
 
+    @Override
+    public UserResponse getById(String id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isPresent()) {
+            return mapToResponse(user.get());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+    }
+
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setRole(user.getRole().getName());
@@ -194,6 +197,7 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, response);
         return response;
     }
+
 
 
 }

@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.jobvacancy.CreateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.SetPicToVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.jobvacancy.JobVacancyResponse;
 import com.lawencon.jobportal.service.JobVacancyService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping({"/api/v1"})
 @AllArgsConstructor
 public class JobVacancyController {
-    final private JobVacancyService service;
+    private final JobVacancyService service;
 
     @GetMapping(value = "/job-vacancies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<List<JobVacancyResponse>>> getAll() {
@@ -40,7 +40,7 @@ public class JobVacancyController {
     }
 
     @RolesAllowed({"SA"})
-    @PostMapping(value = "/job-vacancy", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/job-vacancies", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> create(
             @RequestBody CreateJobVacancyRequest request) {
         service.create(request);
@@ -48,7 +48,7 @@ public class JobVacancyController {
     }
 
     @RolesAllowed({"SA"})
-    @PutMapping(value = "/job-vacancy", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/job-vacancies", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> update(
             @RequestBody UpdateJobVacancyRequest request) {
         service.update(request);
@@ -56,14 +56,14 @@ public class JobVacancyController {
     }
 
     @RolesAllowed({"SA"})
-    @DeleteMapping(value = "/job-vacancy/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/job-vacancies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
     @RolesAllowed({"SA"})
-    @PostMapping(value = "/job-vacancy/set-pic", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/job-vacancies/set-pic", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> setPic(
             @RequestBody @Valid SetPicToVacancyRequest request) {
         service.setPicToVacancy(request);
@@ -71,8 +71,16 @@ public class JobVacancyController {
     }
 
     @RolesAllowed({"HR"})
-    @PostMapping(value = "/job-vacancy/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WebResponse<String>> changeStatus(
+    @PostMapping(value = "/job-vacancies/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<String>> publishVacancy(
+            @RequestBody @Valid UpdateStatusJobVacancyRequest request) {
+        service.publishVacancy(request);
+        return ResponseEntity.ok(ResponseHelper.ok("Success change status"));
+    }
+
+    @RolesAllowed({"HR", "SA"})
+    @PostMapping(value = "/job-vacancies/close", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<String>> closeVacancy(
             @RequestBody @Valid UpdateStatusJobVacancyRequest request) {
         service.publishVacancy(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success change status"));

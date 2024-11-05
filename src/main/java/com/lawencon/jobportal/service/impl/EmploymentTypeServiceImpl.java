@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.response.employmenttype.EmploymentTypeResponse;
+import com.lawencon.jobportal.model.response.EmploymentTypeResponse;
 import com.lawencon.jobportal.persistence.entity.EmploymentType;
 import com.lawencon.jobportal.persistence.repository.EmploymentTypeRepository;
 import com.lawencon.jobportal.service.EmploymentTypeService;

@@ -2,7 +2,7 @@ package com.lawencon.jobportal.authentication.service.impl;
 
 import com.lawencon.jobportal.authentication.service.AuthenticationService;
 import com.lawencon.jobportal.authentication.service.JwtService;
-import com.lawencon.jobportal.model.request.user.LoginRequest;
+import com.lawencon.jobportal.model.request.LoginRequest;
 import com.lawencon.jobportal.model.response.JwtAuthenticationResponse;
 import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.service.UserService;

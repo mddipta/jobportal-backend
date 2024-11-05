@@ -13,4 +13,6 @@ public interface FileService {
     void update(MultipartFile file, String type, String id);
 
     Resource getFile(String id);
+
+    void delete(String id);
 }

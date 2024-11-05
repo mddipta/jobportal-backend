@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.user.CreateUserRequest;
-import com.lawencon.jobportal.model.request.user.UpdateUserRequest;
-import com.lawencon.jobportal.model.request.user.VerificationOtpRequest;
+import com.lawencon.jobportal.model.request.CreateUserRequest;
+import com.lawencon.jobportal.model.request.UpdateUserRequest;
+import com.lawencon.jobportal.model.request.VerificationOtpRequest;
+import com.lawencon.jobportal.model.response.UserResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.user.UserResponse;
 import com.lawencon.jobportal.service.UserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,32 +30,32 @@ import lombok.AllArgsConstructor;
 @RequestMapping({"/api/v1"})
 @AllArgsConstructor
 public class UserController {
-    UserService service;
+    private final UserService service;
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<List<UserResponse>>> getAll() {
         return ResponseEntity.ok(ResponseHelper.ok(service.getAll()));
     }
 
-    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> create(@RequestBody CreateUserRequest request) {
         service.createUser(request);
         return ResponseEntity.ok(ResponseHelper.ok("User has been created successfully"));
     }
 
-    @PutMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> update(@RequestBody UpdateUserRequest request) {
         service.update(request);
         return ResponseEntity.ok(ResponseHelper.ok("User has been updated successfully"));
     }
 
-    @DeleteMapping(value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(ResponseHelper.ok("User has been deleted successfully"));
     }
 
-    @PutMapping(value = "/user/verification", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/users/verification", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> verification(
             @Valid @RequestBody VerificationOtpRequest request) {
         service.validateOtp(request);

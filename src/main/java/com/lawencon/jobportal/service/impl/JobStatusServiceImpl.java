@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.response.jobstatus.JobStatusResponse;
+import com.lawencon.jobportal.model.response.JobStatusResponse;
 import com.lawencon.jobportal.persistence.entity.JobStatus;
 import com.lawencon.jobportal.persistence.repository.JobStatusRepository;
 import com.lawencon.jobportal.service.JobStatusService;

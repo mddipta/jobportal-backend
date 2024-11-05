@@ -211,7 +211,6 @@ CREATE TABLE tb_user_experiences (
 
 ALTER TABLE tb_user_experiences ADD CONSTRAINT user_experience_pk PRIMARY KEY (id);
 ALTER TABLE tb_user_experiences ADD CONSTRAINT user_experience_fk_user FOREIGN KEY (user_id) REFERENCES tb_users;
-ALTER TABLE tb_user_experiences ADD CONSTRAINT user_experience_bk UNIQUE (user_id);
 
 CREATE TABLE tb_user_certifications (
     id text DEFAULT uuid_generate_v4() NOT NULL,
@@ -496,6 +495,8 @@ INSERT INTO tb_locations (name, code) VALUES
 ('Jakarta Utara', 'JKU'), 
 ('Jakarta Barat', 'JKB'), 
 ('Jakarta Selatan', 'JKS');
+
+SELECT * FROM tb_job_vacancies WHERE id = '2d6932ac-2ac1-423d-ad56-aefa22da09d1';
 --
 --INSERT INTO tb_users (username, password, email, role_id) VALUES
 --('superadmin', 'superadmin', 'superadmin@example.com', 'a3ae6dc0-5f92-4499-8971-2dce75539e32');

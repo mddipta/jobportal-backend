@@ -1,10 +1,9 @@
 package com.lawencon.jobportal.service;
 
 import java.util.List;
-
-import com.lawencon.jobportal.model.request.jobdescription.CreateJobDescription;
-import com.lawencon.jobportal.model.request.jobdescription.UpdateJobDescription;
-import com.lawencon.jobportal.model.response.jobdescription.JobDescriptionResponse;
+import com.lawencon.jobportal.model.request.CreateJobDescription;
+import com.lawencon.jobportal.model.request.UpdateJobDescription;
+import com.lawencon.jobportal.model.response.JobDescriptionResponse;
 
 public interface JobDescriptionService {
     List<JobDescriptionResponse> getByJobTitle(String jobTitleId);
@@ -18,4 +17,6 @@ public interface JobDescriptionService {
     void delete(String id);
 
     void deleteMultiple(String titleJobId);
+
+    JobDescriptionResponse getById(String id);
 }

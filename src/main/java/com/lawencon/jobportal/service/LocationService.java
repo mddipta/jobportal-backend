@@ -2,10 +2,9 @@ package com.lawencon.jobportal.service;
 
 import java.util.List;
 import java.util.Optional;
-
-import com.lawencon.jobportal.model.request.location.CreateLocationRequest;
-import com.lawencon.jobportal.model.request.location.UpdateLocationRequest;
-import com.lawencon.jobportal.model.response.location.LocationResponse;
+import com.lawencon.jobportal.model.request.CreateLocationRequest;
+import com.lawencon.jobportal.model.request.UpdateLocationRequest;
+import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.persistence.entity.Location;
 
 public interface LocationService {
@@ -20,4 +19,6 @@ public interface LocationService {
     void update(UpdateLocationRequest request);
 
     void delete(String id);
+
+    LocationResponse getById(String id);
 }

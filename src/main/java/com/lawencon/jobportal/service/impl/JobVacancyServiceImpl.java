@@ -5,18 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.lawencon.jobportal.authentication.helper.SessionHelper;
-import com.lawencon.jobportal.model.request.jobvacancy.CreateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.SetPicToVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancy.UpdateStatusJobVacancyRequest;
-import com.lawencon.jobportal.model.request.jobvacancytransaction.CreateJobVacancyTransactionRequest;
-import com.lawencon.jobportal.model.response.jobstatus.JobStatusResponse;
-import com.lawencon.jobportal.model.response.jobvacancy.JobVacancyResponse;
+import com.lawencon.jobportal.config.RabbitMQConfig;
+import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.CreateJobVacancyTransactionRequest;
+import com.lawencon.jobportal.model.request.JobVacancyDetailRequest;
+import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdatePicJobVacancyRequest;
+import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.response.JobStatusResponse;
+import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.persistence.entity.EmploymentType;
 import com.lawencon.jobportal.persistence.entity.JobStatus;
 import com.lawencon.jobportal.persistence.entity.JobTitle;
@@ -29,6 +34,7 @@ import com.lawencon.jobportal.persistence.repository.JobVacancyRepository;
 import com.lawencon.jobportal.service.EmploymentTypeService;
 import com.lawencon.jobportal.service.JobStatusService;
 import com.lawencon.jobportal.service.JobTitleService;
+import com.lawencon.jobportal.service.JobVacancyDetailService;
 import com.lawencon.jobportal.service.JobVacancyService;
 import com.lawencon.jobportal.service.JobVacancyTransactionService;
 import com.lawencon.jobportal.service.LevelExperienceService;
@@ -40,15 +46,17 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class JobVacancyServiceImpl implements JobVacancyService {
-    JobVacancyRepository repository;
+    private final JobVacancyRepository repository;
+    private final RabbitTemplate rabbitTemplate;
 
-    JobTitleService jobTitleService;
-    EmploymentTypeService employmentTypeService;
-    LevelExperienceService levelExperienceService;
-    LocationService locationService;
-    JobVacancyTransactionService jobVacancyTransactionService;
-    JobStatusService jobStatusService;
-    UserService userService;
+    private final JobTitleService jobTitleService;
+    private final EmploymentTypeService employmentTypeService;
+    private final LevelExperienceService levelExperienceService;
+    private final LocationService locationService;
+    private final JobVacancyTransactionService jobVacancyTransactionService;
+    private final JobStatusService jobStatusService;
+    private final UserService userService;
+    private final JobVacancyDetailService jobVacancyDetailService;
 
     @Override
     public List<JobVacancyResponse> getAll() {
@@ -194,7 +202,12 @@ public class JobVacancyServiceImpl implements JobVacancyService {
             createJobVacancyTransactionRequest.setNumber(1L);
         }
 
+        JobVacancyDetailRequest jobVacancyDetailRequest = new JobVacancyDetailRequest();
+        jobVacancyDetailRequest.setJobVacancy(jobVacancy);
+        jobVacancyDetailRequest.setPicUser(user.get());
+
         jobVacancyTransactionService.create(createJobVacancyTransactionRequest);
+        jobVacancyDetailService.create(jobVacancyDetailRequest);
     }
 
     @Override
@@ -210,7 +223,9 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         JobVacancy jobVacancy = getEntityById(request.getJobVacancyId());
         createJobVacancyTransactionRequest.setJobVacancy(jobVacancy);
 
-        JobStatus jobStatus = jobStatusService.getEntityById(request.getStatus());
+        JobStatusResponse jobStatusResponse = jobStatusService.getByCode(request.getStatus());
+        JobStatus jobStatus = jobStatusService.getEntityById(jobStatusResponse.getId());
+
         createJobVacancyTransactionRequest.setJobStatus(jobStatus);
 
         Optional<User> user = userService.getEntityById(currentUser.getId());
@@ -227,6 +242,30 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         }
 
         jobVacancyTransactionService.create(createJobVacancyTransactionRequest);
+
+        JobVacancyResponse jobVacancyResponse = mapToResponse(jobVacancy);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_TOPIC, "vacancy.notif",
+                jobVacancyResponse);
+    }
+
+    @Override
+    public void updatePicToVacancy(UpdatePicJobVacancyRequest request) {
+        JobVacancy jobVacancy = getEntityById(request.getJobVacancy());
+        User user = userService.getEntityById(request.getPicUser()).get();
+        if (jobVacancy == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job vacancy does not exist");
+        }
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user does not exist");
+        }
+
+        JobVacancyDetailRequest jobVacancyDetailRequest = new JobVacancyDetailRequest();
+        jobVacancyDetailRequest.setJobVacancy(jobVacancy);
+        jobVacancyDetailRequest.setPicUser(user);
+
+        jobVacancyDetailService.update(jobVacancyDetailRequest);
     }
 
     private JobVacancyResponse mapToResponse(JobVacancy jobVacancy) {

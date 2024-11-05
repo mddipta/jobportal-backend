@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.authentication.service.AuthenticationService;
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.user.LoginRequest;
-import com.lawencon.jobportal.model.request.user.RegisterUserRequest;
+import com.lawencon.jobportal.model.request.LoginRequest;
+import com.lawencon.jobportal.model.request.RegisterUserRequest;
 import com.lawencon.jobportal.model.response.JwtAuthenticationResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.service.UserService;

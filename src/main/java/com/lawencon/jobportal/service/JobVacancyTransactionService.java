@@ -1,8 +1,7 @@
 package com.lawencon.jobportal.service;
 
 import java.util.Optional;
-
-import com.lawencon.jobportal.model.request.jobvacancytransaction.CreateJobVacancyTransactionRequest;
+import com.lawencon.jobportal.model.request.CreateJobVacancyTransactionRequest;
 import com.lawencon.jobportal.persistence.entity.JobVacancyTransaction;
 
 public interface JobVacancyTransactionService {

@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.response.selectionstatus.SelectionStatusResponse;
+import com.lawencon.jobportal.model.response.SelectionStatusResponse;
 import com.lawencon.jobportal.persistence.entity.SelectionStageStatus;
 import com.lawencon.jobportal.persistence.repository.SelectionStatusRepository;
 import com.lawencon.jobportal.service.SelectionStatusService;
@@ -17,7 +16,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class SelectionStatusServceImpl implements SelectionStatusService {
-    SelectionStatusRepository repository;
+    private final SelectionStatusRepository repository;
 
     @Override
     public List<SelectionStatusResponse> getAll() {

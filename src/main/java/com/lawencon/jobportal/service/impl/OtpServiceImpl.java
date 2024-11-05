@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class OtpServiceImpl implements OtpService {
-    OtpRepository otpRepository;
+    private final OtpRepository otpRepository;
 
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final int LENGTH = 5;

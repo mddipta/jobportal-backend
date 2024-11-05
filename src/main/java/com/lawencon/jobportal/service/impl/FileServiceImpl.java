@@ -126,6 +126,22 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public void delete(String id) {
+        Optional<File> file = repository.findById(id);
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+        }
+
+        try {
+            Files.deleteIfExists(Paths.get(filePath).resolve(file.get().getFile()));
+            repository.delete(file.get());
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to delete file: " + e.getMessage(), e);
+        }
+    }
+
     private Boolean allowedFileTypeExtension(MultipartFile file, String type) {
         String fileName = file.getOriginalFilename();
         if (fileName == null || !fileName.contains(".")) {
@@ -142,4 +158,6 @@ public class FileServiceImpl implements FileService {
             return false;
         }
     }
+
+
 }

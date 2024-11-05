@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.location.CreateLocationRequest;
-import com.lawencon.jobportal.model.request.location.UpdateLocationRequest;
+import com.lawencon.jobportal.model.request.CreateLocationRequest;
+import com.lawencon.jobportal.model.request.UpdateLocationRequest;
+import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.location.LocationResponse;
 import com.lawencon.jobportal.service.LocationService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,21 +38,21 @@ public class LocationController {
     }
 
     @RolesAllowed({"SA"})
-    @PostMapping(value = "/location", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/locations", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> create(@RequestBody CreateLocationRequest request) {
         service.create(request);
         return ResponseEntity.ok(ResponseHelper.ok("User has been created successfully"));
     }
 
     @RolesAllowed({"SA"})
-    @PutMapping(value = "/location", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/locations", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> update(@RequestBody UpdateLocationRequest request) {
         service.update(request);
         return ResponseEntity.ok("Success");
     }
 
     @RolesAllowed({"SA"})
-    @DeleteMapping(value = "/location/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/locations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok("Success");

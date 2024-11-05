@@ -8,10 +8,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.lawencon.jobportal.model.request.location.CreateLocationRequest;
-import com.lawencon.jobportal.model.request.location.UpdateLocationRequest;
-import com.lawencon.jobportal.model.response.location.LocationResponse;
+import com.lawencon.jobportal.model.request.CreateLocationRequest;
+import com.lawencon.jobportal.model.request.UpdateLocationRequest;
+import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.persistence.entity.Location;
 import com.lawencon.jobportal.persistence.repository.LocationRepository;
 import com.lawencon.jobportal.service.LocationService;
@@ -21,7 +20,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class LocationServiceImpl implements LocationService {
-    LocationRepository repository;
+    private final LocationRepository repository;
 
     @Override
     public List<LocationResponse> getAll() {
@@ -79,5 +78,14 @@ public class LocationServiceImpl implements LocationService {
         LocationResponse response = new LocationResponse();
         BeanUtils.copyProperties(location, response);
         return response;
+    }
+
+    @Override
+    public LocationResponse getById(String id) {
+        Optional<Location> location = repository.findById(id);
+        if (location.isPresent()) {
+            return mapToResponse(location.get());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "location is not exist");
     }
 }

@@ -9,15 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.lawencon.jobportal.model.request.jobdescription.CreateJobDescription;
-import com.lawencon.jobportal.model.request.jobspecification.CreateJobSpecification;
-import com.lawencon.jobportal.model.request.jobtitle.CreateJobTitle;
-import com.lawencon.jobportal.model.request.jobtitle.UpdateJobTitle;
-import com.lawencon.jobportal.model.response.jobdescription.JobDescriptionResponse;
-import com.lawencon.jobportal.model.response.jobspecification.JobSpecificationResponse;
-import com.lawencon.jobportal.model.response.jobtitle.JobTitleDetailResponse;
-import com.lawencon.jobportal.model.response.jobtitle.JobTitleResponse;
+import com.lawencon.jobportal.model.request.CreateJobDescription;
+import com.lawencon.jobportal.model.request.CreateJobSpecification;
+import com.lawencon.jobportal.model.request.CreateJobTitle;
+import com.lawencon.jobportal.model.request.UpdateJobTitle;
+import com.lawencon.jobportal.model.response.JobDescriptionResponse;
+import com.lawencon.jobportal.model.response.JobSpecificationResponse;
+import com.lawencon.jobportal.model.response.JobTitleDetailResponse;
+import com.lawencon.jobportal.model.response.JobTitleResponse;
 import com.lawencon.jobportal.persistence.entity.JobTitle;
 import com.lawencon.jobportal.persistence.repository.JobTitleRepository;
 import com.lawencon.jobportal.service.JobDescriptionService;
@@ -29,9 +28,9 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class JobTitleServiceImpl implements JobTitleService {
-    JobTitleRepository repository;
-    JobDescriptionService jobDescriptionService;
-    JobSpecificationService jobSpecificationService;
+    private final JobTitleRepository repository;
+    private final JobDescriptionService jobDescriptionService;
+    private final JobSpecificationService jobSpecificationService;
 
     @Override
     public List<JobTitleResponse> getAll() {

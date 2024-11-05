@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +25,7 @@ public class EmailServiceImpl implements EmailService {
     private String sender;
 
     @Override
+    @Async
     public void sendOtpEmail(String code, String target) {
         MimeMessage message = mailSender.createMimeMessage();
 

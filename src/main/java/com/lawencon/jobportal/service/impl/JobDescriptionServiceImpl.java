@@ -8,14 +8,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.lawencon.jobportal.model.request.jobdescription.CreateJobDescription;
-import com.lawencon.jobportal.model.request.jobdescription.UpdateJobDescription;
-import com.lawencon.jobportal.model.response.jobdescription.JobDescriptionResponse;
+import com.lawencon.jobportal.model.request.CreateJobDescription;
+import com.lawencon.jobportal.model.request.UpdateJobDescription;
+import com.lawencon.jobportal.model.response.JobDescriptionResponse;
 import com.lawencon.jobportal.persistence.entity.JobDescription;
-import com.lawencon.jobportal.persistence.entity.JobTitle;
 import com.lawencon.jobportal.persistence.repository.JobDescriptionRepository;
-import com.lawencon.jobportal.persistence.repository.JobTitleRepository;
 import com.lawencon.jobportal.service.JobDescriptionService;
 
 import lombok.AllArgsConstructor;
@@ -23,9 +20,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class JobDescriptionServiceImpl implements JobDescriptionService {
-    JobDescriptionRepository repository;
-
-    JobTitleRepository jobTitleRepository;
+    private final JobDescriptionRepository repository;
 
     @Override
     public List<JobDescriptionResponse> getByJobTitle(String jobTitleId) {
@@ -60,12 +55,7 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
     public void createSingle(CreateJobDescription request) {
         JobDescription jobDescription = new JobDescription();
 
-        Optional<JobTitle> jobTitle = jobTitleRepository.findById(request.getJobTitle().getId());
-        if (jobTitle.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job Title not found");
-        }
-
-        jobDescription.setTitleJob(jobTitle.get());
+        jobDescription.setTitleJob(request.getJobTitle());
         jobDescription.setDescription(request.getDescription());
 
         repository.save(jobDescription);
@@ -87,6 +77,21 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         repository.saveAll(jobDescriptions);
     }
 
+    @Override
+    public void deleteMultiple(String titleJobId) {
+        repository.deleteByTitleJobId(titleJobId);
+    }
+
+    @Override
+    public JobDescriptionResponse getById(String id) {
+        Optional<JobDescription> jobDescription = repository.findById(id);
+        if (jobDescription.isPresent()) {
+            return mapToResponse(jobDescription.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job Description not found");
+        }
+    }
+
     private JobDescriptionResponse mapToResponse(JobDescription jobDescription) {
         JobDescriptionResponse response = new JobDescriptionResponse();
         response.setTitleId(jobDescription.getTitleJob().getTitle());
@@ -94,9 +99,6 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         return response;
     }
 
-    @Override
-    public void deleteMultiple(String titleJobId) {
-        repository.deleteByTitleJobId(titleJobId);
-    }
+
 
 }

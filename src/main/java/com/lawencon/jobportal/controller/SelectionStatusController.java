@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
+import com.lawencon.jobportal.model.response.SelectionStatusResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
-import com.lawencon.jobportal.model.response.selectionstatus.SelectionStatusResponse;
 import com.lawencon.jobportal.service.SelectionStatusService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping({"/api/v1"})
 @AllArgsConstructor
 public class SelectionStatusController {
-    SelectionStatusService service;
+    private final SelectionStatusService service;
 
     @RolesAllowed({"SA"})
     @GetMapping(value = "/selection-stage-statuses", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,7 +33,7 @@ public class SelectionStatusController {
     }
 
     @RolesAllowed({"SA"})
-    @GetMapping(value = "/selection-stage-status/{code}",
+    @GetMapping(value = "/selection-stage-statuses/{code}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<SelectionStatusResponse>> findById(
             @PathVariable String code) {

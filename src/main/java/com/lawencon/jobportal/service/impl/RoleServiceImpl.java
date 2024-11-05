@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import com.lawencon.jobportal.model.response.role.RoleResponse;
+import com.lawencon.jobportal.model.response.RoleResponse;
 import com.lawencon.jobportal.persistence.entity.Role;
 import com.lawencon.jobportal.persistence.repository.RoleRepository;
 import com.lawencon.jobportal.service.RoleService;
@@ -17,7 +16,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class RoleServiceImpl implements RoleService {
-    RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     public List<RoleResponse> getAll() {

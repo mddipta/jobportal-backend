@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
-import com.lawencon.jobportal.model.request.jobdescription.CreateJobDescription;
-import com.lawencon.jobportal.model.request.jobdescription.UpdateJobDescription;
+import com.lawencon.jobportal.model.request.CreateJobDescription;
+import com.lawencon.jobportal.model.request.UpdateJobDescription;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.service.JobDescriptionService;
 
@@ -28,21 +28,21 @@ public class JobDescriptionController {
     private final JobDescriptionService service;
 
     @RolesAllowed({"SA"})
-    @PostMapping(value = "/job-description", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/job-descriptions", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> create(@RequestBody CreateJobDescription request) {
         service.createSingle(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
     @RolesAllowed({"SA"})
-    @PutMapping(value = "/job-description", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/job-descriptions", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> update(@RequestBody UpdateJobDescription request) {
         service.update(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
     }
 
     @RolesAllowed({"SA"})
-    @DeleteMapping(value = "/job-description/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/job-descriptions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
