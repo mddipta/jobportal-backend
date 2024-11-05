@@ -1,22 +1,20 @@
 package com.lawencon.jobportal.service.impl;
 
-import java.lang.StackWalker.Option;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.lawencon.jobportal.authentication.helper.SessionHelper;
 import com.lawencon.jobportal.config.RabbitMQConfig;
 import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.CreateJobVacancyTransactionRequest;
 import com.lawencon.jobportal.model.request.JobVacancyDetailRequest;
+import com.lawencon.jobportal.model.request.PublishVacancyRequest;
 import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdatePicJobVacancyRequest;
@@ -42,7 +40,6 @@ import com.lawencon.jobportal.service.JobVacancyTransactionService;
 import com.lawencon.jobportal.service.LevelExperienceService;
 import com.lawencon.jobportal.service.LocationService;
 import com.lawencon.jobportal.service.UserService;
-
 import lombok.AllArgsConstructor;
 
 @Service
@@ -220,7 +217,7 @@ public class JobVacancyServiceImpl implements JobVacancyService {
     }
 
     @Override
-    public void publishVacancy(UpdateStatusJobVacancyRequest request) {
+    public void publishVacancy(PublishVacancyRequest request) {
         User currentUser = SessionHelper.getLoginUser();
         if (currentUser == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authenticated");
@@ -229,10 +226,10 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         CreateJobVacancyTransactionRequest createJobVacancyTransactionRequest =
                 new CreateJobVacancyTransactionRequest();
 
-        JobVacancy jobVacancy = getEntityById(request.getJobVacancyId());
+        JobVacancy jobVacancy = getEntityById(request.getId());
         createJobVacancyTransactionRequest.setJobVacancy(jobVacancy);
 
-        JobStatusResponse jobStatusResponse = jobStatusService.getByCode(request.getStatus());
+        JobStatusResponse jobStatusResponse = jobStatusService.getByCode("OG");
         JobStatus jobStatus = jobStatusService.getEntityById(jobStatusResponse.getId());
 
         createJobVacancyTransactionRequest.setJobStatus(jobStatus);
@@ -240,9 +237,8 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         Optional<User> user = userService.getEntityById(currentUser.getId());
         createJobVacancyTransactionRequest.setUser(user.get());
 
-        createJobVacancyTransactionRequest.setDate(LocalDate.now());
-        Optional<JobVacancyTransaction> jobVacancyTransaction =
-                transaction(request.getJobVacancyId());
+        createJobVacancyTransactionRequest.setDate(request.getDeadline());
+        Optional<JobVacancyTransaction> jobVacancyTransaction = transaction(request.getId());
         if (jobVacancyTransaction.isPresent()) {
             createJobVacancyTransactionRequest
                     .setNumber(jobVacancyTransaction.get().getNumber() + 1);
@@ -292,6 +288,45 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         return responses;
     }
 
+    @Override
+    public void changeStatus(UpdateStatusJobVacancyRequest request) {
+        User currentUser = SessionHelper.getLoginUser();
+        if (currentUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authenticated");
+        }
+
+        CreateJobVacancyTransactionRequest createJobVacancyTransactionRequest =
+                new CreateJobVacancyTransactionRequest();
+
+        JobVacancy jobVacancy = getEntityById(request.getJobVacancyId());
+        createJobVacancyTransactionRequest.setJobVacancy(jobVacancy);
+
+        JobStatusResponse jobStatusResponse = jobStatusService.getByCode(request.getStatus());
+        JobStatus jobStatus = jobStatusService.getEntityById(jobStatusResponse.getId());
+
+        createJobVacancyTransactionRequest.setJobStatus(jobStatus);
+
+        Optional<User> user = userService.getEntityById(currentUser.getId());
+        createJobVacancyTransactionRequest.setUser(user.get());
+
+        createJobVacancyTransactionRequest.setDate(LocalDate.now());
+        Optional<JobVacancyTransaction> jobVacancyTransaction =
+                transaction(request.getJobVacancyId());
+        if (jobVacancyTransaction.isPresent()) {
+            createJobVacancyTransactionRequest
+                    .setNumber(jobVacancyTransaction.get().getNumber() + 1);
+        } else {
+            createJobVacancyTransactionRequest.setNumber(1L);
+        }
+
+        jobVacancyTransactionService.create(createJobVacancyTransactionRequest);
+
+        JobVacancyResponse jobVacancyResponse = mapToResponse(jobVacancy);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_TOPIC, "vacancy.notif",
+                jobVacancyResponse);
+    }
+
     private JobVacancyResponse mapToResponse(JobVacancy jobVacancy) {
         JobVacancyResponse response = new JobVacancyResponse();
         response.setTitleJob(jobVacancy.getJobTitle().getTitle());
@@ -321,5 +356,7 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         }
         return transaction;
     }
+
+
 
 }

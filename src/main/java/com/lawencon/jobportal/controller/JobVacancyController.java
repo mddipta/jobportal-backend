@@ -1,7 +1,6 @@
 package com.lawencon.jobportal.controller;
 
 import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,9 +11,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
+import com.lawencon.jobportal.model.request.PublishVacancyRequest;
 import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
@@ -22,12 +21,10 @@ import com.lawencon.jobportal.model.response.JobVacancyOngoingResponse;
 import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.service.JobVacancyService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Tag(name = "Job Vacancy", description = "Job Vacancy API endpoint")
@@ -76,7 +73,7 @@ public class JobVacancyController {
     @RolesAllowed({"HR"})
     @PostMapping(value = "/job-vacancies/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> publishVacancy(
-            @RequestBody @Valid UpdateStatusJobVacancyRequest request) {
+            @RequestBody @Valid PublishVacancyRequest request) {
         service.publishVacancy(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success change status"));
     }
@@ -85,7 +82,7 @@ public class JobVacancyController {
     @PostMapping(value = "/job-vacancies/close", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<String>> closeVacancy(
             @RequestBody @Valid UpdateStatusJobVacancyRequest request) {
-        service.publishVacancy(request);
+        service.changeStatus(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success change status"));
     }
 

@@ -1,5 +1,23 @@
 package com.lawencon.jobportal.model.request;
 
-public class PublishVacancyRequest {
+import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PublishVacancyRequest {
+    @NotBlank
+    @NotNull
+    private LocalDate deadline;
+
+    @NotBlank
+    @NotNull
+    private String id;
 }
