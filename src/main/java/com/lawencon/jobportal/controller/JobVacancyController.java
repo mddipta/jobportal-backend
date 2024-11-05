@@ -18,6 +18,7 @@ import com.lawencon.jobportal.model.request.CreateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.response.JobVacancyOngoingResponse;
 import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.service.JobVacancyService;
@@ -26,6 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Tag(name = "Job Vacancy", description = "Job Vacancy API endpoint")
 @RestController
@@ -85,4 +88,10 @@ public class JobVacancyController {
         service.publishVacancy(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success change status"));
     }
+
+    @GetMapping(value = "/job-vacancies/ongoing", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<List<JobVacancyOngoingResponse>>> getOngoingVacancy() {
+        return ResponseEntity.ok(ResponseHelper.ok(service.getOpenVacancy()));
+    }
+
 }

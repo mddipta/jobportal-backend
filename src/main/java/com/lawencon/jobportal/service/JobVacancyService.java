@@ -6,6 +6,7 @@ import com.lawencon.jobportal.model.request.SetPicToVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdatePicJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
+import com.lawencon.jobportal.model.response.JobVacancyOngoingResponse;
 import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.persistence.entity.JobVacancy;
 
@@ -27,4 +28,6 @@ public interface JobVacancyService {
     void publishVacancy(UpdateStatusJobVacancyRequest request);
 
     void updatePicToVacancy(UpdatePicJobVacancyRequest request);
+
+    List<JobVacancyOngoingResponse> getOpenVacancy();
 }

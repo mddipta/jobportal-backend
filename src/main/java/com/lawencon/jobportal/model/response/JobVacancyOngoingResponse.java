@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobVacancyResponse {
+public class JobVacancyOngoingResponse {
     private String id;
     private String titleJob;
     private String employmentType;
@@ -19,5 +19,4 @@ public class JobVacancyResponse {
     private Long startSalary;
     private Long endSalary;
     private String deadlineApply;
-    private String status;
 }

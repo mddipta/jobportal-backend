@@ -1,5 +1,6 @@
 package com.lawencon.jobportal.service.impl;
 
+import java.lang.StackWalker.Option;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.lawencon.jobportal.model.request.UpdateJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdatePicJobVacancyRequest;
 import com.lawencon.jobportal.model.request.UpdateStatusJobVacancyRequest;
 import com.lawencon.jobportal.model.response.JobStatusResponse;
+import com.lawencon.jobportal.model.response.JobVacancyOngoingResponse;
 import com.lawencon.jobportal.model.response.JobVacancyResponse;
 import com.lawencon.jobportal.persistence.entity.EmploymentType;
 import com.lawencon.jobportal.persistence.entity.JobStatus;
@@ -64,7 +66,12 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         List<JobVacancy> jobVacancies = repository.findAll();
 
         jobVacancies.forEach(jobVacancy -> {
-            responses.add(mapToResponse(jobVacancy));
+            JobVacancyTransaction jobVacancyTransaction = transaction(jobVacancy.getId()).get();
+
+            JobVacancyResponse response = mapToResponse(jobVacancy);
+
+            response.setStatus(jobVacancyTransaction.getJobStatus().getStatus());
+            responses.add(response);
         });
 
         return responses;
@@ -75,6 +82,8 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         JobVacancy jobVacancy = repository.findById(id).orElse(null);
 
         Optional<JobVacancyTransaction> jobVacancyTransaction = transaction(id);
+        JobVacancyResponse response = mapToResponse(jobVacancy);
+        response.setStatus(jobVacancyTransaction.get().getJobStatus().getStatus());
 
         return mapToResponse(jobVacancy);
     }
@@ -268,6 +277,21 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         jobVacancyDetailService.update(jobVacancyDetailRequest);
     }
 
+    @Override
+    public List<JobVacancyOngoingResponse> getOpenVacancy() {
+        List<JobVacancyOngoingResponse> responses = new ArrayList<>();
+        List<JobVacancy> jobVacancies = repository.findAll();
+
+        jobVacancies.forEach(jobVacancy -> {
+            JobVacancyTransaction jobVacancyTransaction = transaction(jobVacancy.getId()).get();
+            if (jobVacancyTransaction.getJobStatus().getCode().equals("OG")) {
+                responses.add(mapToResponseOngoing(jobVacancy));
+            }
+        });
+
+        return responses;
+    }
+
     private JobVacancyResponse mapToResponse(JobVacancy jobVacancy) {
         JobVacancyResponse response = new JobVacancyResponse();
         response.setTitleJob(jobVacancy.getJobTitle().getTitle());
@@ -278,7 +302,24 @@ public class JobVacancyServiceImpl implements JobVacancyService {
         return response;
     }
 
-    private Optional<JobVacancyTransaction> transaction(String id) {
-        return jobVacancyTransactionService.getLastByJobVacancyId(id);
+    private JobVacancyOngoingResponse mapToResponseOngoing(JobVacancy jobVacancy) {
+        JobVacancyOngoingResponse response = new JobVacancyOngoingResponse();
+        response.setTitleJob(jobVacancy.getJobTitle().getTitle());
+        response.setEmploymentType(jobVacancy.getEmploymentType().getName());
+        response.setLevelExperience(jobVacancy.getLevelExperience().getName());
+        response.setLocation(jobVacancy.getLocation().getName());
+        BeanUtils.copyProperties(jobVacancy, response);
+        return response;
     }
+
+
+    private Optional<JobVacancyTransaction> transaction(String id) {
+        Optional<JobVacancyTransaction> transaction =
+                jobVacancyTransactionService.getLastByJobVacancyId(id);
+        if (transaction.isEmpty()) {
+            Optional.empty();
+        }
+        return transaction;
+    }
+
 }
