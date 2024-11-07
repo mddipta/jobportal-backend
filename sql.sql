@@ -334,10 +334,11 @@ ALTER TABLE tb_job_vacancies_transactions ADD CONSTRAINT job_transaction_fk_job 
 ALTER TABLE tb_job_vacancies_transactions ADD CONSTRAINT job_transaction_fk_job_status FOREIGN KEY (job_status_id) REFERENCES tb_job_statuses;
 ALTER TABLE tb_job_vacancies_transactions ADD CONSTRAINT job_transaction_fk_user FOREIGN KEY (user_id) REFERENCES tb_users;
 
-CREATE TABLE tb_apply_candidate (
+CREATE TABLE tb_apply_candidates (
     id text DEFAULT uuid_generate_v4() NOT NULL,
     user_id TEXT NOT NULL,
     vacancy_job_id TEXT NOT NULL,
+    date_apply DATE NOT NULL,
     created_by TEXT NOT NULL DEFAULT 'SYSTEM',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_by TEXT NULL DEFAULT 'SYSTEM',
@@ -346,9 +347,9 @@ CREATE TABLE tb_apply_candidate (
     deleted_at TIMESTAMPTZ NULL
 );
 
-ALTER TABLE tb_apply_candidate ADD CONSTRAINT apply_candidate_pk PRIMARY KEY (id);
-ALTER TABLE tb_apply_candidate ADD CONSTRAINT apply_candidate_fk_user FOREIGN KEY (user_id) REFERENCES tb_users;
-ALTER TABLE tb_apply_candidate ADD CONSTRAINT apply_candidate_fk_job FOREIGN KEY (vacancy_job_id) REFERENCES tb_job_vacancies;
+ALTER TABLE tb_apply_candidates ADD CONSTRAINT apply_candidate_pk PRIMARY KEY (id);
+ALTER TABLE tb_apply_candidates ADD CONSTRAINT apply_candidate_fk_user FOREIGN KEY (user_id) REFERENCES tb_users;
+ALTER TABLE tb_apply_candidates ADD CONSTRAINT apply_candidate_fk_job FOREIGN KEY (vacancy_job_id) REFERENCES tb_job_vacancies;
 
 CREATE TABLE tb_apply_attachments (
     id text DEFAULT uuid_generate_v4() NOT NULL,
@@ -363,7 +364,7 @@ CREATE TABLE tb_apply_attachments (
 );
 
 ALTER TABLE tb_apply_attachments ADD CONSTRAINT apply_attachment_pk PRIMARY KEY (id);
-ALTER TABLE tb_apply_attachments ADD CONSTRAINT apply_attachment_fk_apply_candidate FOREIGN KEY (apply_candidate_id) REFERENCES tb_apply_candidate;
+ALTER TABLE tb_apply_attachments ADD CONSTRAINT apply_attachment_fk_apply_candidate FOREIGN KEY (apply_candidate_id) REFERENCES tb_apply_candidates;
 ALTER TABLE tb_apply_attachments ADD CONSTRAINT apply_attachment_fk_file FOREIGN KEY (file_attachment_id) REFERENCES tb_files;
 
 CREATE TABLE tb_stage_process (
@@ -373,7 +374,7 @@ CREATE TABLE tb_stage_process (
     stage_selection_id TEXT NOT NULL,
     selection_status_id TEXT NOT NULL,
     score INT DEFAULT 0,
-    date DATE NOT NULL,
+    date_deadline TIMESTAMPTZ NOT NULL,
     number INT NOT NULL,
     created_by TEXT NOT NULL DEFAULT 'SYSTEM',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
