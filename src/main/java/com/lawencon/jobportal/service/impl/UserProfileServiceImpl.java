@@ -33,10 +33,33 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final FileService fileService;
 
     @Override
-    public UserProfileResponse getByUserId() {
+    public UserProfileResponse getByUserLogin() {
         User currentUser = SessionHelper.getLoginUser();
 
         Optional<UserProfile> userProfile = repository.findByUserId(currentUser.getId());
+        if (userProfile.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile not found");
+        }
+
+        UserProfileResponse response = mapToResponse(userProfile.get());
+
+        if (userProfile.get().getProfilePicture() != null) {
+            String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/uploads/")
+                    .path(userProfile.get().getProfilePicture().getFile()).toUriString();
+            response.setProfilePic(fileUrl);
+        }
+        if (userProfile.get().getFileCv() != null) {
+            String cvFileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/").path(userProfile.get().getFileCv().getFile()).toUriString();
+            response.setCvFile(cvFileUrl);
+        }
+
+        return response;
+    }
+
+    @Override
+    public UserProfileResponse getByUserId(String userId) {
+        Optional<UserProfile> userProfile = repository.findByUserId(userId);
         if (userProfile.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile not found");
         }

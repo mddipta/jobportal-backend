@@ -28,7 +28,7 @@ public class UserProfileController {
 
     @GetMapping(value = "/user-profiles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<UserProfileResponse>> get() {
-        return ResponseEntity.ok(ResponseHelper.ok(service.getByUserId()));
+        return ResponseEntity.ok(ResponseHelper.ok(service.getByUserLogin()));
     }
 
 

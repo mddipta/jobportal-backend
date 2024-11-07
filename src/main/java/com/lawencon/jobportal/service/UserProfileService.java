@@ -6,7 +6,9 @@ import com.lawencon.jobportal.model.response.UserProfileResponse;
 
 public interface UserProfileService {
 
-    UserProfileResponse getByUserId();
+    UserProfileResponse getByUserLogin();
+
+    UserProfileResponse getByUserId(String userId);
 
     void create(CreateUserProfileRequest request);
 
