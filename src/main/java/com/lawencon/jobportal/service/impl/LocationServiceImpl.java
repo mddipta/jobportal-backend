@@ -1,14 +1,21 @@
 package com.lawencon.jobportal.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.lawencon.jobportal.helper.SpecificationHelper;
 import com.lawencon.jobportal.model.request.CreateLocationRequest;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateLocationRequest;
 import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.persistence.entity.Location;
@@ -23,13 +30,24 @@ public class LocationServiceImpl implements LocationService {
     private final LocationRepository repository;
 
     @Override
-    public List<LocationResponse> getAll() {
-        List<LocationResponse> responses = new ArrayList<>();
-        List<Location> locations = repository.findAll();
-        locations.forEach(location -> {
-            responses.add(mapToResponse(location));
-        });
-        return responses;
+    public Page<LocationResponse> getAll(PagingRequest pagingRequest, String inquiry) {
+        PageRequest pageRequest =
+                PageRequest.of(pagingRequest.getPage(), pagingRequest.getPageSize(),
+                        SpecificationHelper.createSort(pagingRequest.getSortBy()));
+        Specification<Location> spec = Specification.where(null);
+        if (inquiry != null) {
+            spec = spec
+                    .and(SpecificationHelper.inquiryFilter(Arrays.asList("name", "code"), inquiry));
+        }
+
+        Page<Location> locationResponses = repository.findAll(spec, pageRequest);
+
+        List<LocationResponse> responses = locationResponses.getContent().stream().map(location -> {
+            LocationResponse response = mapToResponse(location);
+            return response;
+        }).toList();
+
+        return new PageImpl<>(responses, pageRequest, locationResponses.getTotalElements());
     }
 
     @Override

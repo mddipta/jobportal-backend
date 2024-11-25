@@ -19,7 +19,6 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE tb_offering_statuses SET deleted_at = now() WHERE id=? AND version =?")
 @Where(clause = "deleted_at IS NULL")
-
 public class OfferingStatus extends MasterEntity{
     @Column(name = "code", nullable = false)
     private String code;

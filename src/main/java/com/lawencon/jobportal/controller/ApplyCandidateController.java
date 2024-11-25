@@ -1,6 +1,8 @@
 package com.lawencon.jobportal.controller;
 
 import java.util.List;
+
+import com.lawencon.jobportal.model.response.ApplyCandidateResponseDetail;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,5 +48,9 @@ public class ApplyCandidateController {
         return ResponseEntity.ok(ResponseHelper.ok("Apply candidate created successfully"));
     }
 
-
+    @RolesAllowed({"KD"})
+    @GetMapping(value = "/apply-vacancies/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<ApplyCandidateResponseDetail>> detail(@PathVariable String id) {
+        return ResponseEntity.ok(ResponseHelper.ok(service.detail(id)));
+    }
 }

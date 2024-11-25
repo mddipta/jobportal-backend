@@ -374,7 +374,7 @@ CREATE TABLE tb_stage_process (
     stage_selection_id TEXT NOT NULL,
     selection_status_id TEXT NOT NULL,
     score INT DEFAULT 0,
-    date_deadline TIMESTAMPTZ NOT NULL,
+    date TIMESTAMPTZ NOT NULL,
     number INT NOT NULL,
     created_by TEXT NOT NULL DEFAULT 'SYSTEM',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

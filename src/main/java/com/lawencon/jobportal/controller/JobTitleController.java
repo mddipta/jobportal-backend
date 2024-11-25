@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.CreateJobTitle;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateJobTitle;
 import com.lawencon.jobportal.model.response.JobTitleDetailResponse;
 import com.lawencon.jobportal.model.response.JobTitleResponse;
@@ -33,8 +35,10 @@ public class JobTitleController {
     final private JobTitleService service;
 
     @GetMapping(value = "/job-titles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WebResponse<List<JobTitleResponse>>> getAll() {
-        return ResponseEntity.ok(ResponseHelper.ok(service.getAll()));
+    public ResponseEntity<WebResponse<List<JobTitleResponse>>> getAll(PagingRequest pagingRequest,
+            @RequestParam(required = false) String inquiry) {
+        return ResponseEntity
+                .ok(ResponseHelper.ok(pagingRequest, service.getAll(pagingRequest, inquiry)));
     }
 
     @GetMapping(value = "/job-titles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -11,9 +11,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplyCandidateResponse {
+public class ApplyCandidateResponseDetail {
     private String id;
     private String vacancyId;
     private String vacancyName;
     private String dateApply;
+    private List<String> attachments;
+    private List<CandidateStageProcessResponse> stageProcess;
 }

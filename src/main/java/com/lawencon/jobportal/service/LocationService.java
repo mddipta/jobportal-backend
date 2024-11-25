@@ -2,13 +2,15 @@ package com.lawencon.jobportal.service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import com.lawencon.jobportal.model.request.CreateLocationRequest;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateLocationRequest;
 import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.persistence.entity.Location;
 
 public interface LocationService {
-    List<LocationResponse> getAll();
+    Page<LocationResponse> getAll(PagingRequest pagingRequest, String inquiry);
 
     Optional<LocationResponse> getByCode(String code);
 

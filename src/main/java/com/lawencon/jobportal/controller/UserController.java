@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.CreateUserRequest;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateUserRequest;
 import com.lawencon.jobportal.model.request.VerificationOtpRequest;
 import com.lawencon.jobportal.model.response.UserResponse;
@@ -33,8 +35,10 @@ public class UserController {
     private final UserService service;
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WebResponse<List<UserResponse>>> getAll() {
-        return ResponseEntity.ok(ResponseHelper.ok(service.getAll()));
+    public ResponseEntity<WebResponse<List<UserResponse>>> getAll(PagingRequest pagingRequest,
+            @RequestParam(required = false) String inquiry) {
+        return ResponseEntity
+                .ok(ResponseHelper.ok(pagingRequest, service.getAll(pagingRequest, inquiry)));
     }
 
     @PostMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)

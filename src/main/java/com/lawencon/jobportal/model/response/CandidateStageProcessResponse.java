@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplyCandidateResponse {
+public class CandidateStageProcessResponse {
     private String id;
-    private String vacancyId;
-    private String vacancyName;
-    private String dateApply;
+    private String stage;
+    private String status;
 }

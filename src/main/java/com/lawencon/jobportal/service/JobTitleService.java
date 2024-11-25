@@ -1,15 +1,16 @@
 package com.lawencon.jobportal.service;
 
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import com.lawencon.jobportal.model.request.CreateJobTitle;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateJobTitle;
 import com.lawencon.jobportal.model.response.JobTitleDetailResponse;
 import com.lawencon.jobportal.model.response.JobTitleResponse;
 import com.lawencon.jobportal.persistence.entity.JobTitle;
 
 public interface JobTitleService {
-    List<JobTitleResponse> getAll();
+    Page<JobTitleResponse> getAll(PagingRequest pagingRequest, String inquiry);
 
     JobTitleDetailResponse getById(String id);
 

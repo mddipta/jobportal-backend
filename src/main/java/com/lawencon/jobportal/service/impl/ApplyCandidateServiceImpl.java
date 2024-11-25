@@ -1,30 +1,29 @@
 package com.lawencon.jobportal.service.impl;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import com.lawencon.jobportal.model.response.UserProfileResponse;
-import com.lawencon.jobportal.service.UserProfileService;
+import com.lawencon.jobportal.authentication.helper.SessionHelper;
+import com.lawencon.jobportal.model.request.CreateApplyAttachmentRequest;
+import com.lawencon.jobportal.model.request.CreateApplyCandidateRequest;
+import com.lawencon.jobportal.model.request.CreateApplyStageProcessRequest;
+import com.lawencon.jobportal.model.response.*;
+import com.lawencon.jobportal.persistence.entity.ApplyCandidate;
+import com.lawencon.jobportal.persistence.entity.JobVacancy;
+import com.lawencon.jobportal.persistence.entity.SelectionStage;
+import com.lawencon.jobportal.persistence.entity.User;
+import com.lawencon.jobportal.persistence.repository.ApplyCandidateRepository;
+import com.lawencon.jobportal.service.*;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import com.lawencon.jobportal.authentication.helper.SessionHelper;
-import com.lawencon.jobportal.model.request.CreateApplyAttachmentRequest;
-import com.lawencon.jobportal.model.request.CreateApplyCandidateRequest;
-import com.lawencon.jobportal.model.response.ApplyAttachmentResponse;
-import com.lawencon.jobportal.model.response.ApplyCandidateResponse;
-import com.lawencon.jobportal.persistence.entity.ApplyCandidate;
-import com.lawencon.jobportal.persistence.entity.JobVacancy;
-import com.lawencon.jobportal.persistence.entity.User;
-import com.lawencon.jobportal.persistence.repository.ApplyCandidateRepository;
-import com.lawencon.jobportal.service.ApplyAttachmentService;
-import com.lawencon.jobportal.service.ApplyCandidateService;
-import com.lawencon.jobportal.service.JobVacancyService;
-import lombok.AllArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +32,8 @@ public class ApplyCandidateServiceImpl implements ApplyCandidateService {
     private final JobVacancyService jobVacancyService;
     private final ApplyAttachmentService applyAttachmentService;
     private final UserProfileService userProfileService;
+    private final StageProcessService stageProcessService;
+    private final SelectionStageService selectionStageService;
 
     @Override
     public List<ApplyCandidateResponse> getByUserIdLogin() {
@@ -96,24 +97,56 @@ public class ApplyCandidateServiceImpl implements ApplyCandidateService {
         attachmentRequest.setApplyCandidates(applyCandidate);
 
         applyAttachmentService.create(attachmentRequest);
+
+        CreateApplyStageProcessRequest requestStage = new CreateApplyStageProcessRequest();
+        requestStage.setUser(user);
+        requestStage.setVacancy(jobVacancy);
+
+        SelectionStageResponse stageResponse = selectionStageService.getByCode("APL");
+        SelectionStage selectionStage = selectionStageService.getEntityById(stageResponse.getId());
+        requestStage.setStage(selectionStage);
+
+        requestStage.setDate(ZonedDateTime.now(ZoneOffset.UTC));
+        stageProcessService.createStageProcessApply(requestStage);
     }
 
-    private ApplyCandidateResponse mapToResponse(ApplyCandidate applyCandidate) {
-        ApplyCandidateResponse response = new ApplyCandidateResponse();
+    @Override
+    public ApplyCandidateResponseDetail detail(String id) {
+        ApplyCandidateResponseDetail response = new ApplyCandidateResponseDetail();
+        Optional<ApplyCandidate> applyCandidate = repository.findById(id);
         List<String> fileUrls = new ArrayList<>();
 
-        response.setVacancyName(applyCandidate.getJobVacancy().getJobTitle().getTitle());
-        response.setVacancyId(applyCandidate.getJobVacancy().getId());
-        response.setDateApply(applyCandidate.getDateApply().toString());
+        if(applyCandidate.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Apply Candidate not found");
+        }
+
+        response.setId(applyCandidate.get().getId());
+        response.setVacancyId(applyCandidate.get().getJobVacancy().getId());
+        response.setVacancyName(applyCandidate.get().getJobVacancy().getJobTitle().getTitle());
+        response.setDateApply(applyCandidate.get().getDateApply().toString());
 
         List<ApplyAttachmentResponse> files =
-                applyAttachmentService.getByApplyId(applyCandidate.getId());
+                applyAttachmentService.getByApplyId(applyCandidate.get().getId());
         files.forEach(file -> {
             String fileUrl = file.getAttachment();
             fileUrls.add(fileUrl);
         });
 
         response.setAttachments(fileUrls);
+        List<CandidateStageProcessResponse> stageProcessSelection = stageProcessService.getByJobVacancyId(applyCandidate.get().getJobVacancy().getId());
+        response.setStageProcess(stageProcessSelection);
+
+        return response;
+    }
+
+    private ApplyCandidateResponse mapToResponse(ApplyCandidate applyCandidate) {
+        ApplyCandidateResponse response = new ApplyCandidateResponse();
+
+
+        response.setVacancyName(applyCandidate.getJobVacancy().getJobTitle().getTitle());
+        response.setVacancyId(applyCandidate.getJobVacancy().getId());
+        response.setDateApply(applyCandidate.getDateApply().toString());
+
 
         BeanUtils.copyProperties(applyCandidate, response);
         return response;
