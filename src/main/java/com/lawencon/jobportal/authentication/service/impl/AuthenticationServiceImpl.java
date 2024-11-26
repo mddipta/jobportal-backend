@@ -1,9 +1,11 @@
 package com.lawencon.jobportal.authentication.service.impl;
 
+import com.lawencon.jobportal.authentication.helper.SessionHelper;
 import com.lawencon.jobportal.authentication.service.AuthenticationService;
 import com.lawencon.jobportal.authentication.service.JwtService;
 import com.lawencon.jobportal.model.request.LoginRequest;
 import com.lawencon.jobportal.model.response.JwtAuthenticationResponse;
+import com.lawencon.jobportal.model.response.UserResponse;
 import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.service.UserService;
 import jakarta.transaction.Transactional;
@@ -41,4 +43,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return JwtAuthenticationResponse.builder().token(token).build();
     }
 
+    @Override
+    public UserResponse getDataLogin() {
+        User userLogin = SessionHelper.getLoginUser();
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(userLogin.getId());
+        userResponse.setEmail(userLogin.getEmail());
+        userResponse.setUsername(userLogin.getUsername());
+        userResponse.setRole(userLogin.getRole().getCode());
+        userResponse.setRoleId(userLogin.getRole().getId());
+
+        return userResponse;
+
+    }
 }

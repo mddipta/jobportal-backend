@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
-@Tag(name = "Location", description = "Location API endpoint")
+@Tag(name = "User", description = "User API endpoint")
 @RestController
 @RequestMapping({"/api/v1"})
 @AllArgsConstructor
