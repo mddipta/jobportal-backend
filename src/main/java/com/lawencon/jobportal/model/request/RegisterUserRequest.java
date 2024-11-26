@@ -22,5 +22,9 @@ public class RegisterUserRequest {
 
     @NotNull
     @NotBlank
+    private String confirmPassword;
+
+    @NotNull
+    @NotBlank
     private String email;
 }

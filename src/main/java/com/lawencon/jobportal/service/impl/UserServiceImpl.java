@@ -99,6 +99,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(RegisterUserRequest request) {
         // Register User for candidate
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password not match");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -109,6 +114,7 @@ public class UserServiceImpl implements UserService {
         if (role.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found");
         }
+
         user.setRole(role.get());
         user = repository.saveAndFlush(user);
         String code = otpService.create(user.getId());
@@ -116,11 +122,6 @@ public class UserServiceImpl implements UserService {
         repository.saveAndFlush(user);
 
         emailService.sendOtpEmail(code, request.getEmail());
-    }
-
-    @Override
-    public Optional<User> getByUsername(String username) {
-        return repository.findByUsername(username);
     }
 
     @Override
