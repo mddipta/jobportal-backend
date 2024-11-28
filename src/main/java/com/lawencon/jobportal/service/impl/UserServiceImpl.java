@@ -24,6 +24,7 @@ import com.lawencon.jobportal.model.request.CreateUserRequest;
 import com.lawencon.jobportal.model.request.LoginRequest;
 import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.RegisterUserRequest;
+import com.lawencon.jobportal.model.request.ResendOtpVerificationRequest;
 import com.lawencon.jobportal.model.request.UpdateUserRequest;
 import com.lawencon.jobportal.model.request.VerificationOtpRequest;
 import com.lawencon.jobportal.model.response.UserResponse;
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
             }
             return user;
         } else if (user.isPresent() && !user.get().getIsActive()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not active");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not active");
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password");
         }
@@ -103,6 +104,9 @@ public class UserServiceImpl implements UserService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password not match");
         }
+
+        validateUsernameExist(request.getUsername());
+        validateEmailExist(request.getEmail());
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -184,14 +188,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void validateOtp(VerificationOtpRequest request) {
-        Boolean isValid = otpService.validate(request.getCode(), request.getUserId());
-        if (!isValid) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid OTP");
-        }
-        Optional<User> user = repository.findById(request.getUserId());
+    public void resendOtp(ResendOtpVerificationRequest request) {
+        Optional<User> user = repository.findByEmail(request.getEmail());
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        }
+
+        if (user.get().getIsActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already active");
+        }
+
+        String code = otpService.recreateOtp(user.get().getId());
+        emailService.sendOtpEmail(code, request.getEmail());
+    }
+
+    @Override
+    public void validateOtp(VerificationOtpRequest request) {
+        Optional<User> user = repository.findByEmail(request.getEmail());
+
+        Boolean isValid = otpService.validate(request.getCode(), user.get().getId());
+        if (!isValid) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid OTP");
         }
 
         User updatedUser = user.get();
@@ -208,10 +225,28 @@ public class UserServiceImpl implements UserService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
     }
 
+    @Override
+    public Long countUser() {
+        return repository.countByIsActiveTrue();
+    }
+
+    private void validateUsernameExist(String username) {
+        Optional<User> user = repository.findByUsername(username);
+        if (user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exist");
+        }
+    }
+
+    private void validateEmailExist(String email) {
+        Optional<User> user = repository.findByEmail(email);
+        if (user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exist");
+        }
+    }
+
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setRole(user.getRole().getName());
-        response.setRoleId(user.getRole().getId());
         BeanUtils.copyProperties(user, response);
         return response;
     }

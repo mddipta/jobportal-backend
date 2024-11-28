@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplyCandidateResponse {
-    private String id;
-    private String vacancyId;
-    private String vacancyName;
-    private String dateApply;
+public class ProcessSelectionStageResponse {
+    private String name;
+    private String selectionStage;
+    private String selectionDate;
+    private String vacancy;
 }

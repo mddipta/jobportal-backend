@@ -327,8 +327,31 @@ public class JobVacancyServiceImpl implements JobVacancyService {
                 jobVacancyResponse);
     }
 
+    @Override
+    public Long countJobVacancy() {
+        return repository.countBy();
+    }
+
+    @Override
+    public List<JobVacancyResponse> getNewestVacancy() {
+        List<JobVacancyResponse> responses = new ArrayList<>();
+        List<JobVacancy> jobVacancies = repository.findTop5ByOrderByCreatedAtDesc();
+
+        jobVacancies.forEach(jobVacancy -> {
+            JobVacancyTransaction jobVacancyTransaction = transaction(jobVacancy.getId()).get();
+
+            JobVacancyResponse response = mapToResponse(jobVacancy);
+
+            response.setStatus(jobVacancyTransaction.getJobStatus().getStatus());
+            responses.add(response);
+        });
+
+        return responses;
+    }
+
     private JobVacancyResponse mapToResponse(JobVacancy jobVacancy) {
         JobVacancyResponse response = new JobVacancyResponse();
+        response.setDeadlineApply(jobVacancy.getDeadlineApply().toString());
         response.setTitleJob(jobVacancy.getJobTitle().getTitle());
         response.setEmploymentType(jobVacancy.getEmploymentType().getName());
         response.setLevelExperience(jobVacancy.getLevelExperience().getName());
@@ -339,6 +362,7 @@ public class JobVacancyServiceImpl implements JobVacancyService {
 
     private JobVacancyOngoingResponse mapToResponseOngoing(JobVacancy jobVacancy) {
         JobVacancyOngoingResponse response = new JobVacancyOngoingResponse();
+        response.setDeadlineApply(jobVacancy.getDeadlineApply().toString());
         response.setTitleJob(jobVacancy.getJobTitle().getTitle());
         response.setEmploymentType(jobVacancy.getEmploymentType().getName());
         response.setLevelExperience(jobVacancy.getLevelExperience().getName());

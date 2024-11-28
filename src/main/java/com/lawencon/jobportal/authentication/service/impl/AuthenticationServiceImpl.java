@@ -46,12 +46,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserResponse getDataLogin() {
         User userLogin = SessionHelper.getLoginUser();
+
+        if (userLogin == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+        }
+
         UserResponse userResponse = new UserResponse();
         userResponse.setId(userLogin.getId());
         userResponse.setEmail(userLogin.getEmail());
         userResponse.setUsername(userLogin.getUsername());
-        userResponse.setRole(userLogin.getRole().getCode());
-        userResponse.setRoleId(userLogin.getRole().getId());
+        userResponse.setRole(userLogin.getRole().getName());
+        userResponse.setRoleCode(userLogin.getRole().getCode());
+
 
         return userResponse;
 

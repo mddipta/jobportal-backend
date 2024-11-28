@@ -440,6 +440,8 @@ CREATE TABLE tb_offering (
 ALTER TABLE tb_offering ADD CONSTRAINT offering_pk PRIMARY KEY (id);
 ALTER TABLE tb_offering ADD CONSTRAINT offering_fk_offering_status FOREIGN KEY (offering_status_id) REFERENCES tb_offering_statuses;
 ALTER TABLE tb_offering ADD CONSTRAINT offering_fk_stage_process FOREIGN KEY (stage_process_id) REFERENCES tb_stage_process;
+ALTER TABLE public.tb_offering ALTER COLUMN date_boarding DROP NOT NULL;
+
 
 CREATE TABLE tb_otp  (
     id text DEFAULT uuid_generate_v4() NOT NULL,

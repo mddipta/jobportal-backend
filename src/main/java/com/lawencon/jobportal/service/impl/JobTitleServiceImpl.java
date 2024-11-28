@@ -139,10 +139,17 @@ public class JobTitleServiceImpl implements JobTitleService {
         repository.deleteById(id);
     }
 
+    @Override
+    public Long countJobTitle() {
+        return repository.countBy();
+    }
+
     private JobTitleResponse mapToResponse(JobTitle jobTitle) {
         JobTitleResponse response = new JobTitleResponse();
         BeanUtils.copyProperties(jobTitle, response);
         return response;
     }
+
+
 
 }

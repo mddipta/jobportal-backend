@@ -8,6 +8,7 @@ import com.lawencon.jobportal.persistence.entity.JobTitle;
 
 @Repository
 public interface JobTitleRepository
-        extends JpaRepository<JobTitle, String>, JpaSpecificationExecutor<JobTitle> {
+                extends JpaRepository<JobTitle, String>, JpaSpecificationExecutor<JobTitle> {
 
+        Long countBy();
 }

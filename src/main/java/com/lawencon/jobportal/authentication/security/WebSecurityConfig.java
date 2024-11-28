@@ -40,12 +40,11 @@ public class WebSecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(
-                        request -> request
-                                .requestMatchers("/api/v1/login", "/api/v1/register",
-                                        "/api/v1/user/verification", "/swagger-ui/**",
-                                        "/v3/api-docs/**", "/uploads/**")
-                                .permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/v1/login", "/api/v1/register", "/api/v1/user-login",
+                                "/api/v1/users/verification", "/api/v1/users/verification/resend",
+                                "/swagger-ui/**", "/v3/api-docs/**", "/uploads/**")
+                        .permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(
                         manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

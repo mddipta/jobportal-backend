@@ -11,11 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationOtpRequest {
-    @NotNull
-    @NotBlank
-    private String code;
-
+public class ResendOtpVerificationRequest {
     @NotNull
     @NotBlank
     private String email;
