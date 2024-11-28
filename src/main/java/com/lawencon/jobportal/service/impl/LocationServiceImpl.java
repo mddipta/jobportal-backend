@@ -1,10 +1,8 @@
 package com.lawencon.jobportal.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,7 +19,6 @@ import com.lawencon.jobportal.model.response.LocationResponse;
 import com.lawencon.jobportal.persistence.entity.Location;
 import com.lawencon.jobportal.persistence.repository.LocationRepository;
 import com.lawencon.jobportal.service.LocationService;
-
 import lombok.AllArgsConstructor;
 
 @Service

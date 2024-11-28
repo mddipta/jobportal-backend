@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.CreateUserRequest;
 import com.lawencon.jobportal.model.request.PagingRequest;
+import com.lawencon.jobportal.model.request.ResendOtpVerificationRequest;
 import com.lawencon.jobportal.model.request.UpdateUserRequest;
 import com.lawencon.jobportal.model.request.VerificationOtpRequest;
 import com.lawencon.jobportal.model.response.UserResponse;
@@ -64,5 +65,12 @@ public class UserController {
             @Valid @RequestBody VerificationOtpRequest request) {
         service.validateOtp(request);
         return ResponseEntity.ok(ResponseHelper.ok("User has been verified successfully"));
+    }
+
+    @PostMapping(value = "/users/verification/resend", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<String>> resend(
+            @RequestBody ResendOtpVerificationRequest request) {
+        service.resendOtp(request);
+        return ResponseEntity.ok(ResponseHelper.ok("Otp has been resent successfully"));
     }
 }

@@ -35,7 +35,7 @@ import lombok.ToString;
 @Where(clause = "deleted_at IS NULL")
 public class UserProfile extends AuditableEntity {
         @OneToOne
-        @JoinColumn(name = "user_id", nullable = false)
+        @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
         private User user;
 
         @OneToOne

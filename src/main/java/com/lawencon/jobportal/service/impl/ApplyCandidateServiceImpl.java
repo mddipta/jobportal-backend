@@ -63,15 +63,14 @@ public class ApplyCandidateServiceImpl implements ApplyCandidateService {
     @Transactional
     public void create(CreateApplyCandidateRequest request) {
         User user = SessionHelper.getLoginUser();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+        }
+
         LocalDate now = LocalDate.now();
         UserProfileResponse userProfile = userProfileService.getByUserId(user.getId());
         Optional<ApplyCandidate> applyCandidateExist =
                 repository.findByJobVacancy_Id(request.getVacancyId());
-
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-        }
 
         if (userProfile == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CV must be uploaded");
@@ -116,7 +115,7 @@ public class ApplyCandidateServiceImpl implements ApplyCandidateService {
         Optional<ApplyCandidate> applyCandidate = repository.findById(id);
         List<String> fileUrls = new ArrayList<>();
 
-        if(applyCandidate.isEmpty()){
+        if (applyCandidate.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Apply Candidate not found");
         }
 
@@ -133,7 +132,8 @@ public class ApplyCandidateServiceImpl implements ApplyCandidateService {
         });
 
         response.setAttachments(fileUrls);
-        List<CandidateStageProcessResponse> stageProcessSelection = stageProcessService.getByJobVacancyId(applyCandidate.get().getJobVacancy().getId());
+        List<CandidateStageProcessResponse> stageProcessSelection =
+                stageProcessService.getByJobVacancyIdAndUserId(applyCandidate.get().getJobVacancy().getId(), applyCandidate.get().getUser().getId());
         response.setStageProcess(stageProcessSelection);
 
         return response;

@@ -1,6 +1,5 @@
 package com.lawencon.jobportal.service;
 
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import com.lawencon.jobportal.model.request.CreateLocationRequest;

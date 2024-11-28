@@ -10,4 +10,6 @@ import com.lawencon.jobportal.persistence.entity.Otp;
 @Repository
 public interface OtpRepository extends JpaRepository<Otp, String> {
     Optional<Otp> findByCodeAndUserId(String code, String userId);
+
+    Optional<Otp> findByUserId(String userId);
 }

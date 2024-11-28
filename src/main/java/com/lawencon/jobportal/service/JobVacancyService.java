@@ -33,4 +33,8 @@ public interface JobVacancyService {
     void changeStatus(UpdateStatusJobVacancyRequest request);
 
     List<JobVacancyOngoingResponse> getOpenVacancy();
+
+    Long countJobVacancy();
+
+    List<JobVacancyResponse> getNewestVacancy();
 }

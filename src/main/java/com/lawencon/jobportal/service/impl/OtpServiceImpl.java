@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Random;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.server.ResponseStatusException;
 import com.lawencon.jobportal.persistence.entity.Otp;
 import com.lawencon.jobportal.persistence.repository.OtpRepository;
 import com.lawencon.jobportal.service.OtpService;
@@ -19,7 +19,7 @@ public class OtpServiceImpl implements OtpService {
     private final OtpRepository otpRepository;
 
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private final int LENGTH = 5;
+    private final int LENGTH = 6;
 
     private String generateOtp() {
         StringBuilder otp = new StringBuilder(LENGTH);
@@ -58,6 +58,26 @@ public class OtpServiceImpl implements OtpService {
 
         otpRepository.delete(otp.get());
         return true;
+    }
+
+
+    @Override
+    public String recreateOtp(String userId) {
+        Optional<Otp> otp = otpRepository.findByUserId(userId);
+
+        if (otp.isPresent()) {
+            Duration duration = Duration.between(otp.get().getCreatedAt(), ZonedDateTime.now());
+            if (duration.toMinutes() < 3) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Cant resend otp, please wait 3 minutes");
+            }
+        }
+
+        if (otp.isPresent()) {
+            otpRepository.delete(otp.get());
+        }
+
+        return create(userId);
     }
 
 }

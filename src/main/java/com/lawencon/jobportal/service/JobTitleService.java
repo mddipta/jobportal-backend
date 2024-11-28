@@ -21,4 +21,6 @@ public interface JobTitleService {
     void update(UpdateJobTitle request);
 
     void delete(String id);
+
+    Long countJobTitle();
 }

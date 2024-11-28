@@ -13,5 +13,7 @@ public interface UserRepository
 
     Optional<User> findByUsername(String username);
 
-    Optional<User> findByUsernameAndPassword(String username, String password);
+    Optional<User> findByEmail(String email);
+
+    Long countByIsActiveTrue();
 }
