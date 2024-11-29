@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.lawencon.jobportal.authentication.helper.SessionHelper;
 import com.lawencon.jobportal.model.request.CreateUserProfileRequest;
 import com.lawencon.jobportal.model.request.UpdateUserProfileRequest;
+import com.lawencon.jobportal.model.response.UserDetailResponse;
 import com.lawencon.jobportal.model.response.UserProfileResponse;
 import com.lawencon.jobportal.persistence.entity.File;
 import com.lawencon.jobportal.persistence.entity.User;
@@ -170,4 +171,35 @@ public class UserProfileServiceImpl implements UserProfileService {
         BeanUtils.copyProperties(userProfile, response);
         return response;
     }
+
+    @Override
+    public UserDetailResponse getDetailUser(String userId) {
+        Optional<User> user = userService.getEntityById(userId);
+        UserProfileResponse userProfile = getByUserId(userId);
+
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        }
+
+        return mapToDetailResponse(user.get(), userProfile);
+    }
+
+    private UserDetailResponse mapToDetailResponse(User user, UserProfileResponse userProfile) {
+        UserDetailResponse response = new UserDetailResponse();
+        response.setRoleCode(user.getRole().getCode());
+        response.setRole(user.getRole().getName());
+        response.setProfilePic(userProfile.getProfilePic());
+        response.setName(userProfile.getName());
+        response.setPhone(userProfile.getPhone());
+        response.setAddress(userProfile.getAddress());
+        response.setCity(userProfile.getCity());
+        response.setGender(userProfile.getGender());
+        response.setBorn(userProfile.getBorn().toString());
+        response.setIsActive(user.getIsActive());
+
+        BeanUtils.copyProperties(user, response);
+        return response;
+    }
+
+
 }

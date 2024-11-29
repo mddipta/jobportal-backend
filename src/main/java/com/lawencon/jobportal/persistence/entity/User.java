@@ -33,5 +33,6 @@ public class User extends MasterEntity {
         @Column(name = "email", nullable = false)
         private String email;
 
-
+        @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private UserProfile userProfile;
 }

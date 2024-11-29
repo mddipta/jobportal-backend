@@ -74,14 +74,15 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public void update(UpdateLocationRequest request) {
         Optional<Location> location = repository.findById(request.getId());
-        if (location.isPresent()) {
-            Location updatedLocation = location.get();
-            updatedLocation.setName(request.getName());
-            updatedLocation.setIsActive(request.getIsActive());
-            updatedLocation.setVersion(updatedLocation.getVersion() + 1);
-            repository.saveAndFlush(updatedLocation);
+        if (location.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "location is not exist");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "location is not exist");
+
+        Location updatedLocation = location.get();
+        updatedLocation.setName(request.getName());
+        updatedLocation.setIsActive(request.getIsActive());
+        updatedLocation.setVersion(updatedLocation.getVersion() + 1);
+        repository.saveAndFlush(updatedLocation);
     }
 
     @Override

@@ -136,30 +136,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(UpdateUserRequest request) {
         Optional<User> user = repository.findById(request.getId());
-        if (user.isPresent()) {
-            User updatedUser = user.get();
-            updatedUser.setUsername(request.getUsername());
-            updatedUser.setEmail(request.getEmail());
-            updatedUser.setVersion(updatedUser.getVersion() + 1);
-
-            if (request.getIsActive() != null) {
-                updatedUser.setIsActive(request.getIsActive());
-            }
-
-            if (request.getPassword() != null) {
-                updatedUser.setPassword(passwordEncoder.encode(request.getPassword()));
-            }
-
-            Optional<Role> role = roleService.getEntityById(request.getRole());
-            if (role.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found");
-            }
-            updatedUser.setRole(role.get());
-
-            repository.saveAndFlush(updatedUser);
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         }
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        User updatedUser = user.get();
+        updatedUser.setUsername(request.getUsername());
+        updatedUser.setEmail(request.getEmail());
+        updatedUser.setVersion(updatedUser.getVersion() + 1);
+
+        if (request.getIsActive() != null) {
+            updatedUser.setIsActive(request.getIsActive());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            updatedUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        Optional<Role> role = roleService.getEntityById(request.getRole());
+        if (role.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found");
+        }
+        updatedUser.setRole(role.get());
+
+        repository.saveAndFlush(updatedUser);
+
     }
 
     @Override
@@ -176,6 +177,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserResponse> responses = userResponses.getContent().stream().map(user -> {
             UserResponse userResponse = mapToResponse(user);
+
             return userResponse;
         }).toList();
 
@@ -219,16 +221,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getById(String id) {
         Optional<User> user = repository.findById(id);
-        if (user.isPresent()) {
-            return mapToResponse(user.get());
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+
+        return mapToResponse(user.get());
     }
 
     @Override
     public Long countUser() {
         return repository.countByIsActiveTrue();
     }
+
+
 
     private void validateUsernameExist(String username) {
         Optional<User> user = repository.findByUsername(username);
@@ -247,6 +252,7 @@ public class UserServiceImpl implements UserService {
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setRole(user.getRole().getName());
+        response.setRoleId(user.getRole().getId());
         BeanUtils.copyProperties(user, response);
         return response;
     }

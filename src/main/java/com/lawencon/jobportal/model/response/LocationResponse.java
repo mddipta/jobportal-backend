@@ -13,4 +13,5 @@ public class LocationResponse {
     private String id;
     private String code;
     private String name;
+    private Boolean isActive;
 }

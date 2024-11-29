@@ -24,6 +24,7 @@ import com.lawencon.jobportal.service.LocationService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @Tag(name = "Location", description = "Location API endpoint")
@@ -39,6 +40,11 @@ public class LocationController {
             @RequestParam(required = false) String inquiry) {
         return ResponseEntity
                 .ok(ResponseHelper.ok(pagingRequest, service.getAll(pagingRequest, inquiry)));
+    }
+
+    @GetMapping(value = "/locations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<LocationResponse>> getById(@Valid @PathVariable String id) {
+        return ResponseEntity.ok(ResponseHelper.ok(service.getById(id)));
     }
 
     @RolesAllowed({"SA"})
