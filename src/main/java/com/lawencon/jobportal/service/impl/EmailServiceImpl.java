@@ -44,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "location is not exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Wrong");
         }
     }
 }

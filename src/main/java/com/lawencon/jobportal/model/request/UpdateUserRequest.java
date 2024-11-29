@@ -32,6 +32,7 @@ public class UpdateUserRequest {
     @NotBlank
     private String role;
 
-    @Null
+    @NotBlank
+    @NotNull
     private Boolean isActive;
 }
