@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import com.lawencon.jobportal.authentication.model.UserPrinciple;
 import com.lawencon.jobportal.helper.SpecificationHelper;
+import com.lawencon.jobportal.helper.ValidateForeignKey;
 import com.lawencon.jobportal.model.request.CreateUserRequest;
 import com.lawencon.jobportal.model.request.LoginRequest;
 import com.lawencon.jobportal.model.request.PagingRequest;
@@ -28,6 +29,8 @@ import com.lawencon.jobportal.model.request.ResendOtpVerificationRequest;
 import com.lawencon.jobportal.model.request.UpdateUserRequest;
 import com.lawencon.jobportal.model.request.VerificationOtpRequest;
 import com.lawencon.jobportal.model.response.UserResponse;
+import com.lawencon.jobportal.persistence.entity.ApplyCandidate;
+import com.lawencon.jobportal.persistence.entity.JobVacancyTransaction;
 import com.lawencon.jobportal.persistence.entity.Role;
 import com.lawencon.jobportal.persistence.entity.User;
 import com.lawencon.jobportal.persistence.repository.UserRepository;
@@ -40,6 +43,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final ValidateForeignKey validateForeignKey;
 
     private final UserRepository repository;
     private final RoleService roleService;
@@ -140,6 +144,10 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         }
 
+        if (!user.get().getUsername().equals(request.getUsername())) {
+            validateUsernameExist(request.getUsername());
+        }
+
         User updatedUser = user.get();
         updatedUser.setUsername(request.getUsername());
         updatedUser.setEmail(request.getEmail());
@@ -186,12 +194,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(String id) {
+        Boolean isHaveFkApplyJob =
+                validateForeignKey.isParentIdReferenced(id, ApplyCandidate.class, "user.id");
+        Boolean isHAveAssignVacancy =
+                validateForeignKey.isParentIdReferenced(id, JobVacancyTransaction.class, "user.id");
+
+        if (isHaveFkApplyJob) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "User cannot be deleted because it has a reference in another table");
+        }
+
+        if (isHAveAssignVacancy) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "User cannot be deleted because it has a reference in another table");
+        }
+
+
         repository.deleteById(id);
     }
 
     @Override
     public void resendOtp(ResendOtpVerificationRequest request) {
         Optional<User> user = repository.findByEmail(request.getEmail());
+
+
+
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         }
@@ -232,8 +259,6 @@ public class UserServiceImpl implements UserService {
     public Long countUser() {
         return repository.countByIsActiveTrue();
     }
-
-
 
     private void validateUsernameExist(String username) {
         Optional<User> user = repository.findByUsername(username);

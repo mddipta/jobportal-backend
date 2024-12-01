@@ -1,18 +1,23 @@
 package com.lawencon.jobportal.controller;
 
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawencon.jobportal.helper.ResponseHelper;
 import com.lawencon.jobportal.model.request.CreateJobDescription;
+import com.lawencon.jobportal.model.request.PagingRequest;
 import com.lawencon.jobportal.model.request.UpdateJobDescription;
+import com.lawencon.jobportal.model.response.JobDescriptionResponse;
 import com.lawencon.jobportal.model.response.WebResponse;
 import com.lawencon.jobportal.service.JobDescriptionService;
 
@@ -32,6 +37,21 @@ public class JobDescriptionController {
     public ResponseEntity<WebResponse<String>> create(@RequestBody CreateJobDescription request) {
         service.createSingle(request);
         return ResponseEntity.ok(ResponseHelper.ok("Success"));
+    }
+
+    @RolesAllowed({"SA"})
+    @GetMapping(value = "/job-descriptions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<List<JobDescriptionResponse>>> getByJobTitleId(
+            PagingRequest pagingRequest, @RequestParam(required = false) String inquiry,
+            @PathVariable String id) {
+        return ResponseEntity.ok(ResponseHelper.ok(pagingRequest,
+                service.jobDescListPage(pagingRequest, inquiry, id)));
+    }
+
+    @RolesAllowed({"SA"})
+    @GetMapping(value = "/job-descriptions/edit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<JobDescriptionResponse>> edit(@PathVariable String id) {
+        return ResponseEntity.ok(ResponseHelper.ok(service.edit(id)));
     }
 
     @RolesAllowed({"SA"})
