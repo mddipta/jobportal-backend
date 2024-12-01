@@ -12,4 +12,5 @@ import lombok.Setter;
 public class JobTitleResponse {
     private String id;
     private String title;
+    private Boolean isActive;
 }

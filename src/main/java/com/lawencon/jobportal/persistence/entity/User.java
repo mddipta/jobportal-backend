@@ -2,6 +2,7 @@ package com.lawencon.jobportal.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -35,4 +36,13 @@ public class User extends MasterEntity {
 
         @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         private UserProfile userProfile;
+
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<UserExperience> experiences;
+
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<Education> educations;
+
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<UserCertification> applications;
 }

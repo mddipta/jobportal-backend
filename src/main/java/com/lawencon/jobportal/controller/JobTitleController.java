@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 public class JobTitleController {
     final private JobTitleService service;
 
+    @RolesAllowed({"SA"})
     @GetMapping(value = "/job-titles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WebResponse<List<JobTitleResponse>>> getAll(PagingRequest pagingRequest,
             @RequestParam(required = false) String inquiry) {
@@ -41,8 +42,15 @@ public class JobTitleController {
                 .ok(ResponseHelper.ok(pagingRequest, service.getAll(pagingRequest, inquiry)));
     }
 
+    @RolesAllowed({"SA"})
+    @GetMapping(value = "/job-titles/{id}/detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<JobTitleDetailResponse>> detail(@PathVariable String id) {
+        return ResponseEntity.ok(ResponseHelper.ok(service.getDetail(id)));
+    }
+
+    @RolesAllowed({"SA"})
     @GetMapping(value = "/job-titles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WebResponse<JobTitleDetailResponse>> getById(@PathVariable String id) {
+    public ResponseEntity<WebResponse<JobTitleResponse>> getDataById(@PathVariable String id) {
         return ResponseEntity.ok(ResponseHelper.ok(service.getById(id)));
     }
 

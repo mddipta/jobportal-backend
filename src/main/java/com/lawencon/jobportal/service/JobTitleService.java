@@ -12,9 +12,11 @@ import com.lawencon.jobportal.persistence.entity.JobTitle;
 public interface JobTitleService {
     Page<JobTitleResponse> getAll(PagingRequest pagingRequest, String inquiry);
 
-    JobTitleDetailResponse getById(String id);
+    JobTitleDetailResponse getDetail(String id);
 
     Optional<JobTitle> getEntityById(String id);
+
+    JobTitleResponse getById(String id);
 
     void create(CreateJobTitle request);
 

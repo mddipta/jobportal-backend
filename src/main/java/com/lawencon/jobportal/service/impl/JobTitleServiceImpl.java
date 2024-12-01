@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import com.lawencon.jobportal.helper.SpecificationHelper;
+import com.lawencon.jobportal.helper.ValidateForeignKey;
 import com.lawencon.jobportal.model.request.CreateJobDescription;
 import com.lawencon.jobportal.model.request.CreateJobSpecification;
 import com.lawencon.jobportal.model.request.CreateJobTitle;
@@ -25,16 +25,18 @@ import com.lawencon.jobportal.model.response.JobSpecificationResponse;
 import com.lawencon.jobportal.model.response.JobTitleDetailResponse;
 import com.lawencon.jobportal.model.response.JobTitleResponse;
 import com.lawencon.jobportal.persistence.entity.JobTitle;
+import com.lawencon.jobportal.persistence.entity.JobVacancy;
 import com.lawencon.jobportal.persistence.repository.JobTitleRepository;
 import com.lawencon.jobportal.service.JobDescriptionService;
 import com.lawencon.jobportal.service.JobSpecificationService;
 import com.lawencon.jobportal.service.JobTitleService;
-
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class JobTitleServiceImpl implements JobTitleService {
+    private final ValidateForeignKey validateForeignKey;
+
     private final JobTitleRepository repository;
     private final JobDescriptionService jobDescriptionService;
     private final JobSpecificationService jobSpecificationService;
@@ -60,7 +62,7 @@ public class JobTitleServiceImpl implements JobTitleService {
     }
 
     @Override
-    public JobTitleDetailResponse getById(String id) {
+    public JobTitleDetailResponse getDetail(String id) {
         Optional<JobTitle> jobTitle = repository.findById(id);
 
         JobTitleDetailResponse response = new JobTitleDetailResponse();
@@ -133,6 +135,14 @@ public class JobTitleServiceImpl implements JobTitleService {
     @Override
     @Transactional
     public void delete(String id) {
+
+        Boolean isHaveFk =
+                validateForeignKey.isParentIdReferenced(id, JobVacancy.class, "jobTitle.id");
+        if (isHaveFk) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job title is being used");
+        }
+
+
         jobDescriptionService.deleteMultiple(id);
         jobSpecificationService.deleteMultiple(id);
 
@@ -144,12 +154,18 @@ public class JobTitleServiceImpl implements JobTitleService {
         return repository.countBy();
     }
 
+    @Override
+    public JobTitleResponse getById(String id) {
+        Optional<JobTitle> jobTitle = repository.findById(id);
+        if (jobTitle.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job title does not exist");
+        }
+        return mapToResponse(jobTitle.get());
+    }
+
     private JobTitleResponse mapToResponse(JobTitle jobTitle) {
         JobTitleResponse response = new JobTitleResponse();
         BeanUtils.copyProperties(jobTitle, response);
         return response;
     }
-
-
-
 }
